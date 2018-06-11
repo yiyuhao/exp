@@ -1,0 +1,200 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block head_title %}
+    批量多单
+{% endblock %}
+{% block content %}
+
+    {% crispy form form.helper %}
+    <div class="row">
+        <div class="col-sm-6">
+            <span>总计单数: <strong id="total_waybill_cnt">{{ total_waybill_cnt }}</strong> 单</span>
+            <span>A1: <strong id="total_a1">{{ total_a1 }}</strong> 单</span>
+            <span>K2: <strong id="total_a1">{{ total_k2 }}</strong> 单</span>
+            <span>Q : <strong id="total_q">{{ total_q }}</strong> 单</span>
+        </div>
+    </div>
+    {% if shelf_list != '' %}
+        <div class="row">
+            <div class="col-sm-12">
+                <button id="next_shelf_btn" class="btn btn-default">下一货架</button>
+                待出单货架:<span id="shelf_list">{{ shelf_list }}</span>
+            </div>
+        </div>
+        <br/>
+    {% endif %}
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="button" id="bulk_print_btn" class="btn btn-warning" value="批量出单"/>
+        </div>
+
+        <div class="col-sm-2">
+            {% if waybill_cnt > 0 %}
+                <span>共计: <span id="waybill_cnt">{{ waybill_cnt }}</span> 单</span><br/>
+                <span>其中: <span id="goods_cnt">{{ goods_cnt }}</span> 件商品</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-4" id="result"></div>
+        <div class="col-xs-12 col-sm-4" id="next_div_pic"></div>
+        <div class="col-xs-12 col-sm-4" id="next_div_des"></div>
+    </div>
+
+    {% render_table table %}
+
+    {% include "sound_alert_module.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            set_up_datepicker();
+            select_all_populate();
+
+            var waybill_cnt = $('#waybill_cnt');
+            var goods_cnt = $('#goods_cnt');
+            var bulk_print_btn = $('#bulk_print_btn');
+            var auto_print_modal = $('#auto_print_modal');
+            var result = $('#result');
+            var next_div_pic = $('#next_div_pic');
+            var next_div_des = $('#next_div_des');
+            var shelf_no_input = $('#id_shelf_no');
+            var loc = $('#id_src_loc');
+            var current_next_index = 0;
+            var next_shelf_btn = $('#next_shelf_btn');
+            var shelf_list = $('#shelf_list');
+            var shelf_no_list = [];
+            var current_shelf_no_index = 0;
+            var search_btn = $('#submit-id-');
+            var channel = $('#id_channel');
+            var dt_input = $('#id_dt');
+
+            search_btn.click(function () {
+                if (loc.val() == "") {
+                    alert('请选择仓库地');
+                    return false
+                }
+
+                {#                if (channel.val() == "") {#}
+                {#                    alert('渠道');#}
+                {#                    return false#}
+                {#                }#}
+            });
+
+            bulk_print_btn.click(function () {
+                waybill_id_list = [];
+                $('td.cb > input').each(function () {
+                    if ($(this).prop('checked')) {
+                        waybill_id_list.push(parseInt($(this).val()))
+                    }
+                });
+
+                if (waybill_id_list.length > 0) {
+                    data = new FormData();
+                    data.append('id_list', waybill_id_list);
+                    data.append('shelf_no', shelf_no_input.val());
+                    data.append('loc', loc.val());
+                    data.append('channel_name', channel.val());
+                    data.append('dt', dt_input.val());
+
+                    $.ajax({
+                        url: '/api-ajax/get-waybills-bulk-print/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            console.log(data);
+                            if (data.url != "") {
+                                w = window.open(data.url);
+                                setTimeout(function () {
+                                    w.close();
+                                }, 6000);
+                                search_btn.focus()
+                            }
+                            result.empty();
+                            result.append(render_result(data));
+
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                }
+
+                return false
+            });
+
+            get_shelf_no_list();
+
+            bind_next_shelf_btn();
+
+            $('.status').popover();
+
+
+            function render_result(data) {
+                var succ = "";
+                var fail = "";
+                var link = "";
+
+                $(data.succ_list).each(function () {
+                    succ += '<li>' + this.tracking_no + '   ' + this.msg + '</li>'
+                });
+                if (succ !== "") {
+                    succ = "<span class='label label-success'> 成功 "
+                        + data.succ_list.length + " 单:</span> <br/>"
+                        + '<ol>' + succ + '</ol>';
+                    link = "<a target='_blank' href='" + data.url + "' >面单下载地址</a>"
+                }
+
+                $(data.fail_list).each(function () {
+                    fail += '<li>' + this.tracking_no + '   ' + this.msg + '</li>'
+                });
+                if (fail !== "") {
+                    fail = "<span class='label label-danger'> 失败 "
+                        + data.fail_list.length + " 单:</span><br/>"
+                        + '<ol>' + fail + '</ol>';
+                }
+                return $("<div>"
+                    + data.msg + link
+                    + "<br/>"
+                    + succ
+                    + '<br />'
+                    + fail
+                    + "</div>"
+                );
+
+            }
+
+
+            function get_shelf_no_list() {
+                if (shelf_list.length > 0) {
+                    shelf_no_list = shelf_list.text().split(',').map(Function.prototype.call, String.prototype.trim);
+
+                    if (shelf_no_input.val() !== "") {
+                        current_shelf_no_index = shelf_no_list.indexOf(shelf_no_input.val().toUpperCase()) + 1;
+                    }
+                }
+            }
+
+            function bind_next_shelf_btn() {
+                if (next_shelf_btn.length > 0) {
+                    next_shelf_btn.click(function () {
+                        shelf_no_input.val(shelf_no_list[current_shelf_no_index % shelf_no_list.length]);
+                        current_shelf_no_index += 1;
+                        search_btn.trigger('click');
+                    });
+                }
+            }
+
+        })
+    </script>
+{% endblock %}

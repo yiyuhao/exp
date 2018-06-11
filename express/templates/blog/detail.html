@@ -1,0 +1,18 @@
+{% extends "waybills/customer_base.html" %}
+
+{% block head_title %}
+    {{ post.title }}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ post.title }}</h1>
+    <i class="fa fa-bell-o"></i><span class="entry-author"> {{ post.category.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+    <i class="fa fa-calendar"></i><span class="entry-categories"> {{ post.create_dt }}</span>
+    <br/><br/>
+    <div>
+        <p>{{ post.content | safe }}</p>
+    </div>
+    <br/><br/>
+{% endblock %}
+
+{% block footer %}{% include "controls/footer.html" %}{% endblock %}

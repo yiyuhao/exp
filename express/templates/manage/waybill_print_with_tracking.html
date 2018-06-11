@@ -1,0 +1,207 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    扫运单号出单
+{% endblock %}
+{% block content %}
+    <!-- 条码扫描区 -->
+    <div class="col-md-3">
+        <div class="col-xs-12">
+            <label for="tracking_no_input">扫入运单号</label>
+            <input type="text" id="tracking_no_input" name="tracking_no_input" style="width: 100%;"/>
+        </div>
+
+        <div class="col-xs-12" style="padding-top: 20px"></div>
+
+        <div class="col-xs-12">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>入库状态</th>
+                    <th>个数</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>成功</td>
+                    <td id="success_cnt"></td>
+                </tr>
+                <tr>
+                    <td>运单号不存在</td>
+                    <td id="not_exist_cnt"></td>
+
+                </tr>
+                <tr>
+                    <td>系统错误</td>
+                    <td id="sys_err_cnt"></td>
+                </tr>
+                <tr>
+                    <td>缺少国内单号</td>
+                    <td id="no_cn_tracking"></td>
+                </tr>
+                <tr>
+                    <td>缺少身份证号</td>
+                    <td id="no_person_id"></td>
+                </tr>
+                <tr>
+                    <td>重复出单提示</td>
+                    <td id="duplicate_err_td"></td>
+                </tr>
+                <tr>
+                    <td>运单异常提示</td>
+                    <td id="waybill_error_status_td"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- 状态显示区 -->
+    <div class="col-md-9">
+        <div class="col-xs-12">
+
+            <div id="message_display">
+                <p id="message_display_text" class="alert alert-info">请在左侧输入运单号后回车. 注意: 出单操作不改变运单状态</p>
+            </div>
+        </div>
+        <div class="col-xs-12">
+
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>运单号</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody id="ajax_post_body">
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    {% include "sound_alert_module.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            var ajax_waybill_cnt = 0;
+            var success_cnt = not_exist_cnt = sys_err_cnt = no_cn_tracking_cnt = no_person_id_cnt = duplicate_err_cnt = waybill_error_status_cnt = 0;
+            var success_cnt_td = $('#success_cnt');
+            var not_exist_cnt_td = $('#not_exist_cnt');
+            var duplicate_err_td = $('#duplicate_err_td');
+            var sys_err_cnt_td = $('#sys_err_cnt');
+            var no_cn_tracking_td = $('#no_cn_tracking');
+            var no_person_id_td = $('#no_person_id');
+            var waybill_error_status_td = $('#waybill_error_status_td');
+
+            cnt = {
+                0: success_cnt,
+                1: not_exist_cnt,
+                2: no_cn_tracking_cnt,
+                3: no_person_id_cnt,
+                4: duplicate_err_cnt,
+                5: sys_err_cnt,
+                6: waybill_error_status_cnt
+            };
+            cnt_elem = {
+                0: success_cnt_td,
+                1: not_exist_cnt_td,
+                2: no_cn_tracking_td,
+                3: no_person_id_td,
+                4: duplicate_err_td,
+                5: sys_err_cnt_td,
+                6: waybill_error_status_td
+
+            };
+
+            var tracking_no_input = $("#tracking_no_input");
+
+            var ajax_post_body = $('#ajax_post_body');
+
+            tracking_no_input.keyup(function (e) {
+                if (e.keyCode == 13) {
+                    // 输入运单号以后, 自动出面单
+                    do_something($(this).val());
+                    $(this).val("")
+                }
+            });
+
+            function do_something(input) {
+                messages = {
+                    0: "运单号存在, 出单成功",
+                    1: "运单号不存在",
+                    2: "缺少国内单号",
+                    3: "缺少身份证号",
+                    4: "已经出单, 请勿重复出单",
+                    5: "系统错误",
+                    6: "运单异常, 可能是顾客退款, 需交由库内处理"
+                };
+
+                css = {
+                    0: "success",
+                    1: "danger",
+                    2: "danger",
+                    3: "warning",
+                    4: "danger",
+                    5: "danger",
+                    6: "danger"
+                };
+
+                cleaned = input.trim();
+                if (cleaned != "") {
+
+                    $.post("/api-ajax/waybill-exist/a/", {
+                        "tracking_no": cleaned,
+                        "send_to_express": true
+                    }, function (data) {
+                        //console.log(data);
+                        ajax_post_body.prepend(
+                            $('<tr class=' + css[data.code] + '>' +
+                                '<td>' +
+                                (++ajax_waybill_cnt) +
+                                '</td>' +
+                                '<td>' +
+                                cleaned +
+                                '</td>' +
+                                '<td>' +
+                                messages[data.code] +
+                                '</td>' +
+                                '</tr>')
+                        );
+                        cnt[data.code] += 1;
+                        cnt_elem[data.code].text(cnt[data.code]);
+
+                        if (data.code == 0) {
+                            tracking_no_input.focus();
+                            var wnd = window.open(data.link, '_blank');
+
+                            //自动关闭
+                            setTimeout(function () {
+                                wnd.close();
+                            }, 5000);
+
+                        } else {
+                            tracking_no_input.blur();
+                            sound_id = '';
+                            if (data.code == 6 || data.code == 1) sound_id = '#sound_refund';
+                            else sound_id = '#sound_alert';
+                            sound_alert2(data.tracking_no + messages[data.code], "打单暂停", sound_id);
+                            $('#error_modal').on('hidden.bs.modal', function () {
+                                tracking_no_input.focus();
+                            });
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+
+{% endblock %}

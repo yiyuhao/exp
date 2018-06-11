@@ -1,0 +1,352 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block head_title %} 打板 {% endblock %}
+
+{% block css %}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-3">
+            <div class="col-xs-12" style="padding-top: 15px"></div>
+
+            <div class="col-xs-12">
+                <label for="tracking_no_input">扫入运单号*</label>
+                <input type="text" id="tracking_no_input" name="tracking_no_input" style="width: 100%"/>
+            </div>
+        </div>
+
+        <div class="col-xs-9">
+            <div class="col-xs-12">
+                <div id="message_display">
+                    <p id="message_display_text" class="alert alert-info">请输入运单号后回车</p>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <table class="table table-border">
+                    <thead>
+                    <tr>
+                        <th>当前扫描单号</th>
+                        <th>打板操作信息</th>
+                        <th>操作时间<br/><span id="curr_time"></span></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td id="curr_tracking_no_td"></td>
+                        <td id="curr_status_td"></td>
+                        <td><span id="curr_modified_time"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="row" id="channel_list">
+    </div>
+
+    <input id="last_input" type="hidden"/>
+
+    {% include "controls/sound_alert_module_pallet_create.html" %}
+
+    {% include "controls/channel_sound.html" %}
+
+    <div class="modal" id="big_borad_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    渠道:<h1 id="bb_channel"></h1>
+                    总数:<h1 id="total_cnt"></h1>
+                    总重:<h1 id="total_weight"></h1>
+                </div>
+                <div class="modal-footer">
+                    <input id="error_modal_close_btn" type="button" class="btn btn-default" data-dismiss="modal"
+                           value="Close"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script src="{% static "js/moment-with-locales.min.js" %}"></script>
+    <script>
+
+        var channel_list = $('#channel_list');
+        var tracking_no_input = $('#tracking_no_input');
+        var checking_waybill_tbody = $('#checking_waybill_tbody');
+        var waybill_cnt_map = {};
+        var message_display_text = $('#message_display_text'); // 信息提示
+        var last_input = $('#last_input');
+        var curr_tracking_no_td = $('#curr_tracking_no_td');
+        var curr_status_td = $('#curr_status_td');
+        var curr_modified_time = $('#curr_modified_time');
+        var curr_time = $('#curr_time');
+
+        var show_curr_time = setInterval(function () {
+            curr_time.text(moment().format("h:mm:ss a"));
+        }, 1000);
+
+        var waybill_weight_map = {};
+
+        var total_cnt = $('#total_cnt');
+        var total_weight = $('#total_weight');
+        var big_borad_modal = $('#big_borad_modal');
+        var bb_channel = $('#bb_channel');
+
+        big_borad_modal.draggable({
+            handle: ".modal-body"
+        });
+
+        function initial() {
+            $.post('/api-ajax/waybills-in-pallet-not-submit/', function (data) {
+                if (data.code == 0) {
+                    $.each(data.waybills, function (i, waybill) {
+                        add_to_channel_list(waybill);
+                    });
+                }
+            }, 'json');
+        }
+
+        function add_to_channel_list(waybill) {
+            var channel_list_obj = $('#channel-' + waybill.channel_id);
+            if (channel_list_obj.length === 0) {
+                channel_list_obj = create_channel_list(waybill.channel_id, waybill.channel_name)
+            }
+            channel_list_obj.find('tbody').prepend(generate_waybill_row(waybill));
+            $("#cnt-" + waybill.channel_id).text(waybill_cnt_map[waybill.channel_id]);
+            $("#weight-" + waybill.channel_id).text((waybill_weight_map[waybill.channel_id] * 0.453592).toFixed(2) + "(kg)");
+
+        }
+
+        function create_channel_list(channel_id, channel_name) {
+            var table = $('<table class="table table-responsive table-border"></table>');
+            var thead = $('<thead></thead>');
+            var create_btn = $(`<input type="button" id="create-${channel_id}" class="btn btn-sm btn-primary" value="生成托盘"/>`);
+            var tr = $('<tr></tr>');
+            var td = $('<td colspan="3"></td>');
+            var tbody = $('<tbody></tbody>');
+            var div1 = $(`<div class="col-xs-3" id="channel-${channel_id}"></div>`);
+            var channel_span = $(`<span><h5> ${channel_name}</h5></span>`);
+            var span = $(`<div>个数:<span id="cnt-${channel_id}"></span><br/>重量:<span id="weight-${channel_id}"></span></div>`);
+
+            td.append(channel_span);
+            td.append(create_btn);
+            td.append(span);
+            tr.append(td);
+            thead.append(tr);
+            table.append(thead);
+            table.append(tbody);
+            channel_list.append(div1);
+
+            div1.append(table);
+
+            waybill_cnt_map[channel_id] = 0;
+            waybill_weight_map[channel_id] = 0;
+
+            create_btn.click(function () {
+                var rows = $(this).closest('table').find('tbody tr');
+                if (rows.length > 0) {
+                    var track_id_list = [];
+                    rows.each(function () {
+                        track_id_list.push($(this).attr('data-toggle'));
+                        $(this).find('.waybill_delete_from_pallet').hide();
+                    });
+                    track_id_list_str = track_id_list.join(',');
+                    $.post("/api-ajax/pallet-create/", {
+                        "track_id_list_str": track_id_list_str,
+                        'pallet_weight': 0
+                    }, function (data) {
+                        code = {
+                            0: "托盘创建成功, 托盘号:",
+                            1: "运单已有所属托盘, 单号:",
+                            2: "系统错误, 请重试",
+                            3: "运单列表为空"
+                        };
+                        css = {
+                            0: "success",
+                            1: "danger",
+                            2: "danger",
+                            3: "danger"
+                        };
+                        if (data.code == 0) {
+                            ajax_return_alert(message_display_text, css[data.code], code[data.code] + data.pallet_no);
+                            div1.remove();
+                        } else if (data.code == 1) {
+                            ajax_return_alert(message_display_text, css[data.code], code[data.code] + data.error_tracking_no_list);
+                        } else {
+                            ajax_return_alert(message_display_text, css[data.code], code[data.code]);
+                        }
+                    });
+                }
+            });
+
+            channel_list.append(div1);
+
+            return div1
+        }
+
+        function generate_waybill_row(waybill) {
+            var a = $('<a class="btn btn-sm btn-danger waybill_delete_from_pallet">X</a>');
+            var tr = $('<tr data-toggle=' + waybill.id + '>' +
+                '<td>' +
+                (++waybill_cnt_map[waybill.channel_id]) +
+                '</td>' +
+                '<td>' +
+                waybill.tracking_no +
+                '</td>' +
+                '</tr>');
+            var td = $('<td></td>');
+
+            waybill_weight_map[waybill.channel_id] += waybill.weight;
+
+            td.append(a);
+            tr.append(td);
+            a.click(function () {
+                var curr_row = $(this).closest('tr');
+                $.post('/api-ajax/waybill-pallet-delete/' + waybill.id + '/', function (data) {
+                    if (data.code === 0) {
+                        curr_row.remove();
+                        waybill_cnt_map[waybill.channel_id]--;
+                        $("#cnt-" + waybill.channel_id).text(waybill_cnt_map[waybill.channel_id]);
+                        waybill_weight_map[waybill.channel_id] -= waybill.weight;
+                        $("#weight-" + waybill.channel_id).text((waybill_weight_map[waybill.channel_id] * 0.453592).toFixed(2) + "(kg)");
+                    } else {
+                        sound_alert("从托盘删除包裹有误", data.msg)
+                    }
+
+                });
+                return false
+            });
+            return tr;
+        }
+
+        function tracking_no_input_renew() {
+            tracking_no_input.val('');
+            tracking_no_input.focus();
+        }
+
+        function waybill_status_show(tracking_no, msg) {
+            curr_tracking_no_td.text(tracking_no);
+            curr_status_td.text(msg);
+            curr_modified_time.text(moment().format("h:mm:ss a"));
+        }
+
+        function showBigBorad(channel_id, channel_name) {
+            var cnt = $("#cnt-" + channel_id).text();
+            var weight = $("#weight-" + channel_id).text();
+            bb_channel.text(channel_name);
+
+            total_cnt.text(cnt);
+            total_weight.text(weight);
+            big_borad_modal.modal('show');
+        }
+
+        $(function () {
+            ajaxSetup();
+            initial();
+            tracking_no_input.keyup(function (e) {
+                messages = {
+                    0: "成功",
+                    1: "运单号不存在",
+                    2: "状态不允许打板",
+                    3: "已经打板",
+                    4: "渠道错误",
+                    5: "系统错误",
+                    6: "该批次同名或同身份证号已超过5个, 该包裹需等下一批再出库",
+                    7: "该批次奢侈品订单超过15单, 该包裹需等下一批再出库",
+                    8: "奢侈品暂时无法打板出库",
+                    9: "特殊拦截",
+                    10: "没身份证",
+                    11: "该批次已存在该收件人包裹, 需要等下批出库"
+                };
+
+                css = {
+                    0: "success",
+                    1: "danger",
+                    2: "danger",
+                    3: "danger",
+                    4: "danger",
+                    5: "danger",
+                    6: "danger",
+                    7: "danger",
+                    8: "danger",
+                    9: "danger",
+                    10: "warning",
+                    11: "warning"
+                };
+                if (e.keyCode === 13) {
+                    var tracking_no = tracking_no_input.val().trim();
+                    if (tracking_no !== "") {
+                        d = {"tracking_no": tracking_no};
+
+                        $.post('/api-ajax/waybill-package-to-pallet2/', d, function (data) {
+                            //console.log(data);
+                            if (data.code === 0) {
+                                add_to_channel_list(data.waybill);
+                                var channel_sound = "sound_" + data.waybill.channel_name;
+                                if ($('#' + channel_sound).length > 0) {
+                                    $('#' + channel_sound).get(0).play();
+                                } else {
+                                    play_add_to_pallet_sound();
+                                }
+                                // 显示大数字
+                                showBigBorad(data.waybill.channel_id, data.waybill.channel_name)
+
+                            } else {
+                                big_borad_modal.modal('hide');
+                                tracking_no_input.blur();
+                                sound_alert(data.waybill.tracking_no + messages[data.code], data.goods_des);
+                            }
+                            tracking_no_input_renew();
+                            waybill_status_show(data.waybill.tracking_no, messages[data.code])
+                        });
+
+                        last_input.val(tracking_no);
+                    }
+                }
+            });
+
+            var force_add = $('#force_add');
+            if (force_add.length > 0) {
+                force_add.click(function () {
+                    var error_modal = $('#error_modal').modal('hide');
+                    var last_tracking_no = last_input.val().trim();
+                    d = {"tracking_no": last_tracking_no, "force_add": true};
+                    if (last_tracking_no != "") {
+                        $.post("/api-ajax/waybill-package-to-pallet2/", d, function (data) {
+                            console.log(data);
+                            if (data.code === 0) {
+                                add_to_channel_list(data.waybill);
+                                var channel_sound = "sound_" + data.waybill.channel_name;
+                                if ($('#' + channel_sound).length > 0) {
+                                    $('#' + channel_sound).get(0).play();
+                                } else {
+                                    play_add_to_pallet_sound();
+                                }
+                            } else {
+                                tracking_no_input.blur();
+                                sound_alert(last_tracking_no + messages[data.code], "打板暂停")
+                            }
+                            tracking_no_input_renew();
+                            waybill_status_show(data.waybill.tracking_no, messages[data.code])
+
+                        })
+                    }
+                    return false;
+                });
+            }
+        })
+    </script>
+{% endblock %}

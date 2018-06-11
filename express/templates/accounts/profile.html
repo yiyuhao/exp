@@ -1,0 +1,16 @@
+{% extends base_template %}
+
+{% load crispy_forms_tags %}
+{% block head_title %}
+    {{ title }}
+{% endblock %}
+{% block content %}
+
+    <h1>{{ request.user.last_name }} {{ request.user.first_name }} </h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <input type="submit" class='btn btn-success' value={{ submit_value }}>
+    </form>
+
+{% endblock %}

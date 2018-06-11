@@ -1,0 +1,333 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    审核
+{% endblock %}
+{% block content %}
+    <div class="col-md-3">
+        <div class="col-xs-12">
+            <label for="tracking_no_input">扫入运单号</label>
+            <input type="text" id="tracking_no_input" name="tracking_no_input" style="width: 100%;"/>
+        </div>
+        <div class="col-xs-12">
+            <label for="package_fee_check">记打包费(BOX)</label>
+            <input type="checkbox" id="package_fee_check" name="tracking_no_input"/>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="col-xs-12">
+
+            <div id="message_display">
+                <p id="message_display_text" class="alert alert-info">请输入运单号后回车</p>
+            </div>
+            <div id="waybill_detail">
+                <h4>运单</h4>
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th>运单号</th>
+                        <th>国内运单号</th>
+                        <th>状态</th>
+                        <th>用户</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><p id="tracking_no"></p><input id="waybill_id" type="hidden" value=""/></td>
+                        <td><p id="cn_tracking"></p></td>
+                        <td><p id="status"></p></td>
+                        <td><p id="user"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h4>商品</h4>
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>品牌</th>
+                        <th>描述</th>
+                        <th>个数</th>
+                        <th>单重</th>
+                    </tr>
+                    </thead>
+                    <tbody id="goods">
+                    </tbody>
+                </table>
+            </div>
+            {#  实际重量  提交按钮          #}
+            <div id="sumbit-btns" style="display: none;">
+                <label for="weight_input">实际重量</label>
+                <input type="number" step="0.01" id="weight_input" name="weight_input" placeholder="实际重量" max="200"/>
+                <input type="button" id="submit_waybill_audit_btn" class="btn btn-default" value="提交"/>
+                <p id="check_btn_success_post_message" style="display: none;"></p>
+            </div>
+        </div>
+        <hr/>
+        <div class="col-xs-12">
+            <h4>操作记录</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>输入</th>
+                    <th>运单号</th>
+                    <th>审核</th>
+                </tr>
+                </thead>
+                <tbody id="ajax_post_body">
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    {% include "sound_alert_module.html" %}
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            var ajax_waybill_cnt = 0;
+            var tracking_no_input = $('#tracking_no_input');
+            var weight_btn = $('#submit_waybill_audit_btn');
+            var waybill_id_hid = $("#waybill_id");
+            var weight_input = $('#weight_input');
+            var goods_tbody = $('#goods');
+            var weight_succ_notice = $('#check_btn_success_post_message');
+            var submit_btn_div = $('#sumbit-btns');
+            var status_p = $('#status');
+            var user_p = $('#user');
+            var cn_tracking_p = $('#cn_tracking');
+            var tracking_no_p = $('#tracking_no');
+            var ajax_post_body = $('#ajax_post_body');
+            var package_fee_check = $('#package_fee_check');
+
+            tracking_no_input.keyup(function (e) {
+                if (e.keyCode == 13) {
+                    clean_template();
+                    // do something
+                    do_something($(this).val());
+                    // $(this).val("")
+                }
+            });
+
+            weight_btn.click(function () {
+                var weight = weight_input.val();
+                var confirm_result = false;
+                if (!$.isNumeric(weight)) {
+                    sound_alert("输入的重量不是数字");
+                } else {
+                    if (weight > 10) {
+                        confirm_result = confirm('重量超过10, 确定吗?');
+                    } else if (weight < 0) {
+                        sound_alert("重量不能小于0!");
+                    } else {
+                        confirm_result = true;
+                    }
+
+                    if (confirm_result) {
+                        id = waybill_id_hid.val();
+                        d = {"id": id, "weight": weight, 'is_box': package_fee_check.is(":checked")};
+                        $(this).hide();
+                        $.post("/api-ajax/waybill-weight/", d, function (data) {
+                            render_post_submit(0, data, weight)
+                        })
+                    }
+                }
+            });
+
+            weight_input.keyup(function (e) {
+                if (e.keyCode == 13) {
+                    if (weight_btn.is(":visible")) {
+                        weight_btn.trigger('click')
+                    }
+                }
+            });
+            function activateMessage(css, message) {
+                ajax_return_alert($('#message_display_text'), css, message);
+            }
+
+            function clean_template() {
+                $('#waybill_detail p').text("");
+
+                goods_tbody.empty();
+
+                weight_input.val("");
+
+                weight_succ_notice.show();
+                submit_btn_div.hide();
+
+            }
+
+            function do_something(input) {
+
+                // 获取订单信息
+                // { "tracing_no", "goods" list , "status", "用户"}
+                tracking_no = input.trim();
+                if (tracking_no != "") {
+                    // do ajax call
+                    $.post("/api-ajax/waybill-check-form/", {"tracking_no": tracking_no}, function (data) {
+                        //console.log(data);
+
+                        render_waybill(data);
+                        render_submit_items(data);
+
+                    })
+                }
+            }
+
+            // {} -> #waybill_detail
+            function render_waybill(data) {
+                /*
+                 code
+                 0 success
+                 1 not exist
+                 2 not valid to full check
+                 3 system error
+                 */
+                code = {
+                    0: "运单加载成功",
+                    1: "运单不存在",
+                    2: "运单已审核",
+                    3: "当前运单状态下不允许审核",
+                    4: "系统错误, 请重试"
+                };
+                code_class = {
+                    0: "success",
+                    1: "danger",
+                    2: "info",
+                    3: "danger",
+                    4: "danger"
+                };
+                // 显示message
+                activateMessage(code_class[data.code], code[data.code] + ',' + data.msg);
+                // 绑定数据
+                if (data.code == 0 || data.code == 2 || data.code == 3) {
+                    tracking_no_p.text(data.waybill_obj.tracking_no);
+                    waybill_id_hid.val(data.waybill_obj.id);
+                    status_p.text(data.waybill_obj.status);
+                    user_p.text(data.waybill_obj.user);
+                    cn_tracking_p.text(data.waybill_obj.cn_tracking);
+
+                    $(data.waybill_obj.goods).each(function (i, e) {
+                        var row = $("<tr/>");
+                        goods_tbody.append(row);
+                        row.append('<td>' + e.hs_type + '</td>');
+                        row.append('<td>' + e.brand + '</td>');
+                        row.append('<td>' + e.description + '</td>');
+                        row.append('<td>' + e.quantity + '</td>');
+                        row.append('<td>' + e.unit_weight + '</td>');
+
+                    });
+                }
+
+                post_result = "";
+
+                if (data.code == 0) {
+                    weight_btn.show();
+                    post_result = data.waybill_obj.tracking_no;
+                } else {
+                    weight_btn.hide();
+                    post_result = code[data.code];
+                    sound_alert("审核异常", code[data.code] + ',' + data.msg)
+                }
+
+
+                ajax_post_body.prepend(
+                    $('<tr class=' + code_class[data.code] + '>' +
+                        '<td>' +
+                        (++ajax_waybill_cnt) +
+                        '</td>' +
+                        '<td>' +
+                        tracking_no +
+                        '</td>' +
+                        '<td>' +
+                        post_result +
+                        '</td>' +
+                        '</tr>')
+                );
+
+
+            }
+
+            function render_submit_items(data) {
+                // 根据订单状态, 设定是否可以提交审核以及提交异常
+                submit_btn_div.hide();
+
+
+                if (data.code == 0 || data.code == 2) {
+                    submit_btn_div.show();
+                    weight_input.focus()
+                }
+            }
+
+            function render_post_submit(action, data, weight) {
+                sumit_check_code = {
+                    0: "审核成功",
+                    1: "运单不存在",
+                    2: "运单已经审核或状态不允许审核",
+                    3: "系统异常, 请重新提交"
+                };
+
+                sumit_check_code_class = {
+                    0: "success",
+                    1: "danger",
+                    2: "info",
+                    3: "danger"
+                };
+
+                report_error_code = {
+                    0: "提交问题单成功",
+                    1: "运单不存在",
+                    2: "运单已经是异常状态",
+                    3: "运单状态不允许转为异常",
+                    4: "系统异常, 请重新提交"
+                };
+
+                report_error_code_class = {
+                    0: "success",
+                    1: "danger",
+                    2: "info",
+                    3: "danger",
+                    4: "danger"
+
+                };
+
+
+                if (action == 0) { // 审核
+
+                    activateMessage(sumit_check_code_class[data.code], sumit_check_code[data.code]);
+
+                    if (data.code == 0 || data.code == 1 || data.code == 2) {
+                        tracking_no_input.val("").focus();
+                        weight_btn.hide()
+                    }
+
+                    var append_weight = "";
+                    if (data.code == 0) {
+                        append_weight = ", 重量: " + weight
+                    }
+
+                    ajax_post_body.find('tr:first').append(
+                        $('<td class="' + sumit_check_code_class[data.code] + '">' + sumit_check_code[data.code] + append_weight + '</td>'))
+
+                } else if (action == 1) { // 提交异常
+                    activateMessage(report_error_code_class[data.code], report_error_code[data.code]);
+
+                    if (data.code == 0 || data.code == 1 || data.code == 2 || data.code == 3) {
+                        tracking_no_input.val("").focus();
+                    }
+                }
+            }
+
+        })
+    </script>
+
+{% endblock %}

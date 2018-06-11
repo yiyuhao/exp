@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <textarea id="data" cols="40" rows="5"></textarea>
+    <input type="submit" value="submit" class="btn btn-success" id="request">
+    <pre id="json"></pre>
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+
+    <script>
+        $(function () {
+            ajaxSetup();
+            $('#request').click(function () {
+                {#                console.log(JSON.parse($('#data').val()));#}
+                {#                $.postJSON("/api/waybill_bulk_create/", $('#data').val(), function (data) {#}
+                {#                    document.getElementById("json").innerHTML = JSON.stringify(data, undefined, 2);#}
+                {#                })#}
+                data = JSON.parse($('#data').val());
+                console.log(data)
+
+                $.ajax({
+                    'type': 'POST',
+                    'url': "/api/waybill_bulk_create/",
+                    'contentType': 'application/json',
+                    'data': $('#data').val(),
+                    'dataType': 'json',
+                    'success': function (data) {
+                        document.getElementById("json").innerHTML = JSON.stringify(data, undefined, 2);
+                    },
+                    'error': function (data) {
+                        document.getElementById("json").innerHTML = JSON.stringify(data, undefined, 2);
+                    }
+                });
+            });
+        })
+    </script>
+{% endblock %}

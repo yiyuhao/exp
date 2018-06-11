@@ -1,0 +1,33 @@
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"json":{"data":"here"}}' http://theurl.com/to/post/to
+
+
+curl http://127.0.0.1:8000/api/ -o ~/Desktop/ -c cookies.txt -s
+
+grep csrftoken cookies.txt | cut -f 7
+
+http://stackoverflow.com/questions/19827164/how-can-i-get-a-csrf-token-from-the-command-line
+
+get token
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"username":"yi", "password":"niconico"}' http://localhost:8000/api-token-auth/
+
+
+API 需要解决的问题
+1 用 terminal 工具访问 api
+
+2 ajax 站外访问API
+
+3 ajax 站内防伪API （已实现）
+
+
+1 2 需要通读并实践
+http://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication
+
+
+Excel 处理模块需要处理
+导入
+    校验及错误处理
+    数据库写入
+    返回处理结果
+
+导出
+    基于模版的数据表导出

@@ -1,0 +1,57 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block head_title %}
+    提单管理
+{% endblock %}
+
+{% block content %}
+
+    {% crispy form form.helper %}
+
+{% endblock %}
+
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+
+            var action_btn = $('#submit-id-action-submit');
+            var file_input = $('#id_file');
+            var file;
+
+            file_input.on('change', function (e) {
+                console.log('change');
+                files = e.target.files;
+                if (files.length > 0) {
+                    file = files[0]
+                }
+            });
+
+
+            action_btn.click(function () {
+                data = new FormData();
+                data.append('file', file);
+                $.ajax({
+                    url: '/api-ajax/check-cn-status/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        window.open(data.url)
+                    },
+                    error: function () {
+                        alert('发生异常')
+                    }
+                });
+                return false;
+            });
+
+        })
+    </script>
+{% endblock %}

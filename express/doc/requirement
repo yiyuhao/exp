@@ -1,0 +1,261 @@
+客户操作
+------
+可以创建修改删除运单， 入库后的订单不可以删除， 清关中的运单不可以修改地址
+可以查询运单的状态
+用户可以批量导入excel表格进行批量建单
+可以导出报表
+
+1 运单创建
+/waybills/ POST method
+data = [ waybill, ]
+
+waybill = {
+	"tracking_no": "22",
+	"weight": 10.23,
+  .... address.....
+
+	"goods": [
+		{
+			"cat1": "包",
+			"cat2": "手提包",
+			"brand": "coach",
+			"description": "大法",
+			"quantity": 1,
+			"unit_price": 10,
+			"unit_weight": 2
+		},
+		{
+			"cat1": "鞋",
+			"cat2": "运动鞋",
+			"brand": "nike",
+			"description": "adf",
+			"quantity": 1,
+			"unit_price": 10,
+			"unit_weight": 2
+		}
+	]
+}
+
+2 运单删除
+/waybills/{id}  DELETE
+
+
+3 运单修改
+/waybills/{id} PUT, PATCH
+商品信息goods 会用新的数据直接覆盖原来的数据
+{
+    "url": "http://127.0.0.1:8000/waybills/6/",
+    "id": 6,
+    "user": "yi",
+    "tracking_no": "12312312",
+    "cn_tracking": null,
+    "weight": "1.75",
+    "goods": [
+        {
+            "cat1": "包bao",
+            "cat2": "手提包",
+            "brand": "coach",
+            "description": "大法",
+            "quantity": 1,
+            "unit_price": "10.0",
+            "unit_weight": "2.0",
+            "remark": null
+        },
+        {
+			"cat1": "鞋",
+			"cat2": "运动鞋",
+			"brand": "nike",
+			"description": "adf",
+			"quantity": 1,
+			"unit_price": 10,
+			"unit_weight": 2
+		}
+    ],
+    "pallet": null
+}
+
+4 运单批量创建
+/waybills/bulk_create POST method
+[
+{
+    "tracking_no": "003",
+    "cn_tracking": null,
+    "weight": "1.75",
+    "goods": [
+        {
+            "cat1": "包bao",
+            "cat2": "手提包",
+            "brand": "coach",
+            "description": "大法",
+            "quantity": 1,
+            "unit_price": "10.0",
+            "unit_weight": "2.0",
+            "remark": null
+        },
+        {
+			"cat1": "鞋",
+			"cat2": "运动鞋",
+			"brand": "nike",
+			"description": "adf",
+			"quantity": 1,
+			"unit_price": 10,
+			"unit_weight": 2
+		}
+    ],
+    "pallet": null
+},
+{
+    "tracking_no": "004",
+    "cn_tracking": null,
+    "weight": "1.75",
+    "goods": [
+        {
+            "cat1": "包bao",
+            "cat2": "手提包",
+            "brand": "coach",
+            "description": "大法",
+            "quantity": 1,
+            "unit_price": "10.0",
+            "unit_weight": "2.0",
+            "remark": null
+        },
+        {
+			"cat1": "鞋",
+			"cat2": "运动鞋",
+			"brand": "nike",
+			"description": "adf",
+			"quantity": 1,
+			"unit_price": 10,
+			"unit_weight": 2
+		}
+    ],
+    "pallet": null
+}
+]
+
+5 运单状态查询
+
+
+
+ coreapi action waybills create -p weight=1.75 -p tracking_no="89891" -data goods="{"cat1": "包", "cat2": "手提包", "description":"大法", "quantity": 1,"unit_price" : 10, "unit_weight" : 2,}"
+
+
+
+
+美国员工操作
+---------
+入库
+审核重量
+扣费
+建立托盘
+建立出库批次
+出库
+删除托盘
+删除出库批次
+
+
+国内员工操作
+----------
+托盘清点
+批量换单
+出库
+
+管理人员
+------
+赔偿
+计损
+统计
+
+
+
+
+运单结构
+=======
+渠道类别 channel_type 电商件，行邮
+收费类别 charge_type
+国际单号 tracking_no
+国内单号 cn_tracking
+包裹重量 weight
+托盘    pallet
+用户    user
+备注    remark
+收费单价  charge_rate
+
+#发件人地址信息
+#收件人地址信息
+#商品信息
+
+运单流转状态
+==========
+顺序号
+状态名
+
+运单流转记录
+==========
+运单
+运单流转状态
+时间戳
+
+商品信息结构
+==========
+品牌
+描述
+个数
+单价
+单个重量
+备注
+大类别 固定可选值
+小类别 固定可选址
+运单
+
+地址信息结构
+==========
+类型： 发件人， 收件人， 通用
+联系人
+省
+市
+区县
+地址
+邮编
+手机
+
+用户信息
+======
+email
+密码
+联系人
+电话
+地址
+
+操作日志
+======
+类型： 入库， 审核扣费， 出库， 赔偿
+操作类型： 创建， 删除， 修改
+操作人
+对象类型
+对象id
+描述
+
+托盘
+===
+批次
+重量
+# 还有什么信息
+。。。。
+修改时间
+创建人
+位置
+
+
+批次
+=======
+类型： 国际段， 国内段
+# 还有什么。。。
+
+修改时间
+创建人
+状态
+
+批次流转信息
+=========
+出库批次

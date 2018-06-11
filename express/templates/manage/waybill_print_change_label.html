@@ -1,0 +1,94 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    换单
+{% endblock %}
+{% block content %}
+    <!-- 条码扫描区 -->
+    <div class="col-md-3">
+        <div class="col-xs-12">
+            <label for="tracking_no_input">扫入运单号</label>
+            <input type="text" id="tracking_no_input" name="tracking_no_input" style="width: 100%;"/>
+            <input type="checkbox" id="cn_tracking_cb" name="cn_tracking_cb" /> 原国内单号
+        </div>
+    </div>
+
+    <!-- 状态显示区 -->
+    <div class="col-md-9">
+        <div class="col-xs-12">
+
+            <div id="message_display">
+                <p id="message_display_text" class="alert alert-info">请在左侧输入运单号后回车. 注意: 换单操作不改变运单状态</p>
+            </div>
+        </div>
+    </div>
+
+    {% include "sound_alert_module.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+
+            var tracking_no_input = $("#tracking_no_input");
+
+            var ajax_post_body = $('#ajax_post_body');
+
+            var cn_tracking_cb = $('#cn_tracking_cb');
+
+            tracking_no_input.keyup(function (e) {
+                if (e.keyCode == 13) {
+                    // 输入运单号以后, 自动出面单
+                    do_something($(this).val());
+                    $(this).val("")
+                }
+            });
+
+            function do_something(input) {
+                messages = {
+                    0: "换单成功",
+                    1: "原单号不存在",
+                };
+
+                css = {
+                    0: "success",
+                    1: "danger",
+                };
+
+                cleaned = input.trim();
+                if (cleaned != "") {
+
+                    var url = '/api-ajax/waybill-exist/c/';
+                    if (!cn_tracking_cb.is(':checked')) {
+                        url = '/api-ajax/waybill-exist/d/';
+                    }
+
+                    $.post(url, {
+                        "tracking_no": cleaned,
+                    }, function (data) {
+                        //console.log(data);
+
+                        if (data.code == 0) {
+                            tracking_no_input.focus();
+                            var wnd = window.open(data.link, '_blank');
+
+                            //自动关闭
+                            setTimeout(function () {
+                                wnd.close();
+                            }, 8000);
+
+                        } else {
+                            tracking_no_input.blur();
+                            sound_alert(data.tracking_no + messages[data.code], "换单暂停")
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+
+{% endblock %}

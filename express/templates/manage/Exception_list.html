@@ -1,0 +1,249 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block head_title %} 破损/丢件处理 {% endblock %}
+
+{% block css %}
+    <style type="text/css">
+        .delete > a {
+            color: red
+        }
+    </style>
+
+{% endblock css %}
+
+
+{% block content %}
+    {% crispy form form.helper %}
+
+
+    <div style="display: inline;">
+        <input type="button" class="btn btn-info" id="create_btn" value="新增"/>
+        <p class="label"></p>
+    </div>
+
+    {% render_table table %}
+
+    <div class="modal" id="create_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="create_modal_text" style="text-align: center">新增问题件</h5>
+
+                    <p id="create_modal_fail_message" style="display: none; color: red;"></p>
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form id="create_form" method="post" action="" class="form-horizontal">
+                                {% csrf_token %}
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="type" class="control-label">类型</label>
+                                        <select id="type" name="type" class="form-control">
+                                            <option value="丢件">丢件</option>
+                                            <option value="破损">破损</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="tracking_no" class="control-label">运单选择</label>
+                                        <div class="input-group">
+                                            <input id='tracking_no' name="tracking_no" type="text"
+                                                   class="form-control"/>
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-default">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                           </span>
+                                        </div>
+                                        <small id="tracking_no_help" class="form-text text-muted"></small>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="description" class="control-label">物品品名</label>
+                                        <input id='description' name="description" type="text" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="images" class="control-label">内物图/破损凭证</label>
+                                        <input id='images' name="images" type="file" multiple class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="value" class="control-label">价值（人民币）</label>
+                                        <input id='value' name="value" type="text" class="form-control"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="qty" class="control-label">商品个数</label>
+                                        <input id='qty' name="qty" type="text" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="area" class="control-label">区域</label>
+                                        <select id="area" name="area" class="form-control">
+                                            <option value="美国">美国</option>
+                                            <option value="中国">中国</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="remark" class="control-label">备注</label>
+                                        <input id='remark' name="remark" type="text" class="form-control"/>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="create_modal_clear" type="button" class="btn btn-default">清空</button>
+                    <button id="create_modal_confirm" type="button" class="btn btn-primary">提交</button>
+                    <button id="create_modal_confirm_next" type="button" class="btn btn-primary">提交并继续下一个</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="pic_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="create_modal_text" style="text-align: center">内物图/破损图</h5>
+                    <div class="row" id="pic_container">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+
+
+        $(function () {
+            ajaxSetup();
+            select_all_populate();
+            set_up_datepicker();
+
+            let create_modal = $('#create_modal');
+            let create_modal_fail_message = $('#create_modal_fail_message');
+            let create_btn = $('#create_btn');
+            let create_modal_confirm = $('#create_modal_confirm');
+            let create_modal_confirm_next = $('#create_modal_confirm_next');
+            let pic_container = $('#pic_container');
+            let pic_modal = $('#pic_modal');
+            let create_form = $('#create_form');
+            let create_modal_clear = $('#create_modal_clear');
+
+            create_btn.click(function () {
+                create_modal.modal('show')
+            });
+
+            create_modal_clear.click(function () {
+                clearModal();
+                create_modal_fail_message.text("")
+            });
+
+            function clearModal() {
+                create_form.find('input').val("");
+                create_form.find('select').each(function () {
+                    $(this).val($(this).find('option:first').val())
+                })
+            }
+
+            function add_new_record(next) {
+                d = new FormData();
+                $('#create_form input').each(function (i, e) {
+                    if ($(e).attr('type') == "text") {
+                        d.append($(e).attr('name'), $(e).val());
+                    }
+                    else if ($(e).attr('type') == "file") {
+                        $.each($(e)[0].files, function (i, f) {
+                            d.append('files' + i.toString(), f)
+                        });
+                    }
+                });
+
+                $('#create_form select').each(function (i, e) {
+                    d.append($(e).attr('name'), $(e).val());
+                });
+
+                $.ajax({
+                    'url': '/api-ajax/add-exception-record/',
+                    'type': 'POST',
+                    'processData': false,
+                    'contentType': false,
+                    'data': d,
+                    'dataType': 'json',
+                    'success': function (data) {
+                        if (data.succ) {
+                            clearModal();
+                            if (next) {
+                                alert('提交成功， 你可以继续添加下一个');
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            create_modal_fail_message.text(data.msg);
+                            create_modal_fail_message.show();
+                        }
+                    },
+                    'error': function (data) {
+                    }
+                });
+            }
+
+            create_modal_confirm.click(function () {
+                add_new_record(false)
+            });
+
+            create_modal_confirm_next.click(function () {
+                add_new_record(true)
+            });
+
+            $('.img').click(function () {
+
+                $.ajax({
+                    'url': '/api-ajax/get-exception-record-images/',
+                    'type': 'POST',
+                    'data': {id: $(this).attr('data')},
+                    'dataType': 'json',
+                    'success': function (data) {
+                        pic_container.empty();
+
+                        if (data.succ) {
+                            $(data.urls).each(function () {
+                                content = '<div class="col-xs-12"> <img class="img img-thumbnail" src="' + this + '"/></div>';
+                                pic_container.append($(content));
+                            });
+                        }
+                        pic_modal.modal('show');
+
+                    },
+                    'error': function (data) {
+                        alert("error")
+                    }
+                });
+
+            })
+        })
+    </script>
+{% endblock %}

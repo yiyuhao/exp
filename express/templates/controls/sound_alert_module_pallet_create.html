@@ -1,0 +1,6 @@
+{% extends "sound_alert_module.html" %}
+{% block perm_block %}
+    {% if perms.pallets.can_force_add %}
+        <input id="force_add" type="button" class="btn-sm btn-danger" value="强行加入"/>
+    {% endif %}
+{% endblock %}

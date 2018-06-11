@@ -1,0 +1,45 @@
+{% extends "waybills/customer_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    {% if next %}
+        <div class="alert alert-dismissible alert-warning">
+            <p>
+                {% if user.is_authenticated %}
+                    Your account doesn't have access to this page. To proceed,
+                    please login with an account that has access.
+                {% else %}
+                    Please login to see this page.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-sm-4 col-sm-push-4">
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                {{ form | crispy }}
+
+                <input class="btn btn-primary" type="submit" value="login"/>
+                <input type="hidden" name="next" value="{{ next }}"/>
+                <input type="hidden" id='user_tz' name="user_tz"/>
+
+            </form>
+
+            {# Assumes you setup the password_reset view in your URLconf #}
+            {# <p><a href="{% url 'password_reset' %}">忘记密码?</a></p>#}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script>
+        $(function () {
+            $('#user_tz').val(jstz.determine().name())
+        })
+    </script>
+{% endblock %}

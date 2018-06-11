@@ -1,0 +1,278 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    入库
+{% endblock %}
+{% block content %}
+    <!-- 条码扫描区 -->
+    <div class="col-md-3">
+        <div class="col-xs-12">
+            <label for="tracking_no_input">扫入运单号</label>
+            <input type="text" id="tracking_no_input" name="tracking_no_input" style="width: 100%;"/>
+        </div>
+        <div class="col-xs-12" style="padding-top: 20px"></div>
+        <div class="col-xs-12">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>入库状态</th>
+                    <th>个数</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>成功</td>
+                    <td id="success_cnt"></td>
+                </tr>
+                <tr>
+                    <td>运单号不存在</td>
+                    <td id="not_exist_cnt"></td>
+
+                </tr>
+                <tr>
+                    <td>状态错误</td>
+                    <td id="status_err_cnt"></td>
+
+                </tr>
+                <tr>
+                    <td>重复扫描</td>
+                    <td id="duplicate_cnt"></td>
+
+                </tr>
+                <tr>
+                    <td>系统错误</td>
+                    <td id="sys_err_cnt"></td>
+
+                </tr>
+                <tr>
+                    <td>缺少国内单号</td>
+                    <td id="no_cn_tracking_cnt"></td>
+
+                </tr>
+                <tr>
+                    <td>缺少身份证</td>
+                    <td id="no_person_id_cnt"></td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- 状态显示区 -->
+    <div class="col-md-9">
+        <div class="col-xs-12">
+
+            <div id="message_display">
+                <p id="message_display_text" class="alert alert-info">请输入运单号后回车</p>
+            </div>
+        </div>
+        <div class="col-xs-8">
+
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th colspan="3">操作记录</th>
+                </tr>
+                <tr>
+                    <th>#</th>
+                    <th>运单号</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody id="ajax_post_body">
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="col-xs-4">
+            <div class="col-xs-12">
+                <label for="in_warehouse_select">来源仓库</label>
+                <select id="in_warehouse_select" name="in_warehouse_select" style="width: 100%;">
+                    <option value="">----</option>
+                    <option value="1">NH</option>
+                    <option value="2">NJ</option>
+                    <option value="3">FL</option>
+                </select>
+            </div>
+
+            <div class="col-xs-12">
+                <label for="date_input">日期</label>
+                <input type="text" id="date_input" name="date_input" placeholder="例如: 170601" style="width: 100%;"/>
+            </div>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th colspan="3">
+                        <input type="button" id="check_btn" class="btn btn-primary btn-sm" value="核对"/>
+                    </th>
+                </tr>
+                <tr>
+                    <th>#</th>
+                    <th>运单号</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody id="batch_info_body"></tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    {% include "sound_alert_module.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            var ajax_waybill_cnt = 0;
+            var success_cnt = not_exist_cnt = status_err_cnt = duplicate_cnt = sys_err_cnt = no_cn_tracking_cnt = no_person_id_cnt = 0;
+
+            var date_input = $("#date_input");
+            var batch_info_body = $("#batch_info_body");
+            var in_warehouse_select = $("#in_warehouse_select");
+            var check_btn = $('#check_btn');
+
+            cnt = {
+                0: success_cnt,
+                1: not_exist_cnt,
+                2: status_err_cnt,
+                3: duplicate_cnt,
+                4: sys_err_cnt,
+                5: no_cn_tracking_cnt,
+                6: no_person_id_cnt
+            };
+            cnt_elem = {
+                0: $("#success_cnt"),
+                1: $("#not_exist_cnt"),
+                2: $("#status_err_cnt"),
+                3: $("#duplicate_cnt"),
+                4: $("#sys_err_cnt"),
+                5: $("#no_cn_tracking_cnt"),
+                6: $("#no_person_id_cnt")
+            };
+            $("#tracking_no_input").keyup(function (e) {
+                if (e.keyCode == 13) {
+                    // do something
+                    do_something($(this).val());
+                    $(this).val("")
+                }
+            });
+
+            function do_something(input) {
+                messages = {
+                    0: "入库成功",
+                    1: "运单号不存在",
+                    2: "状态不允许入库",
+                    3: "已经入库",
+                    4: "系统错误",
+                    5: "缺少国内单号",
+                    6: "缺少身份证号"
+                };
+
+                css = {
+                    0: "success",
+                    1: "danger",
+                    2: "danger",
+                    3: "info",
+                    4: "danger",
+                    5: "danger",
+                    6: "danger"
+                };
+
+                play_sound = {
+                    "BC": play_bc_sound,
+                    "USPS": play_usps_sound
+                };
+
+                cleaned = input.trim();
+                if (cleaned != "") {
+                    $.post("/api-ajax/waybill-checkin/", {"tracking_no": cleaned}, function (data) {
+                        $('#ajax_post_body').prepend(
+                            $('<tr class=' + css[data.code] + '>' +
+                                '<td>' +
+                                (++ajax_waybill_cnt) +
+                                '</td>' +
+                                '<td>' +
+                                data.tracking_no +
+                                '</td>' +
+                                '<td>' +
+                                messages[data.code] + ", " + data.channel +
+                                '</td>' +
+                                '</tr>')
+                        );
+                        cnt[data.code] += 1;
+                        cnt_elem[data.code].text(cnt[data.code]);
+
+                        if (data.code == 0) {
+                            $('#tracking_no_input').focus();
+                            //play_sound[data.channel]();
+                        } else {
+                            $('#tracking_no_input').blur();
+                            sound_alert(data.tracking_no + messages[data.code], "入库暂停")
+                        }
+                    })
+                }
+            }
+
+            check_btn.click(function (e) {
+
+                if (date_input.val().trim() == "" || in_warehouse_select.val() == "") {
+                    alert("请填写日期并选择仓库");
+                    return;
+                }
+
+
+                $.ajax({
+                    url: '/api-ajax/get-waybills-cn-tracking/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: JSON.stringify({'date': date_input.val(), "warehouse": in_warehouse_select.val()}),
+                    contentType: "application/json",
+                    success: function (data) {
+                        batch_info_body.empty();
+                        if (data.status_sum_up.length > 0) {
+                            $(data.status_sum_up).each(function (i, e) {
+                                var row = $("<tr/>");
+                                batch_info_body.append(row);
+                                row.append('<td colspan="2">' + e.status__name + '</td>');
+                                row.append('<td>' + e.total + '</td>');
+                            });
+                            var row = $("<tr/>");
+                            batch_info_body.append(row);
+                            row.append('<td colspan="2">' + '总单数' + '</td>');
+                            row.append('<td>' + data.total + '</td>')
+                        }
+                        if (data.result.length > 0) {
+                            var row = $("<tr/>");
+                            batch_info_body.append(row);
+                            row.append('<td colspan="2">' + "尚未入库运单列表" + '</td>');
+                            row.append('<td>' + data.not_check_in_cnt + '</td>');
+
+                            $(data.result).each(function (i, e) {
+                                var row = $("<tr id='" + e.id + "' class='" + e.style + "'></tr>");
+                                batch_info_body.append(row);
+                                row.append('<td>' + (i + 1).toString() + '</td>');
+                                row.append('<td>' + e.tracking_no + '</td>');
+                                row.append('<td>' + e.status + '</td>');
+                            });
+                        }
+                    }
+                    ,
+                    error: function () {
+                        alert('发生异常')
+                    }
+                });
+            });
+        })
+    </script>
+
+{% endblock %}

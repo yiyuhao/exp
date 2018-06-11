@@ -1,0 +1,501 @@
+{% extends "waybills/customer_base.html" %}
+{% load static %}
+{% block head_title %}
+    士奇快递 HuskyEx
+{% endblock %}
+{% block css %}
+    <link rel='stylesheet' href='{% static "css/slides.css" %}'/>
+    <style>
+        hr.primary {
+            border-color: #32bec0;
+            border-width: 3px;
+            max-width: 50px;
+        }
+    </style>
+{% endblock css %}
+
+{% block header_blank %}{% endblock %}
+
+{% block boxed %}
+
+    <!-- 轮播图 -->
+    <div class="tp-banner-container">
+        <div class="tp-banner">
+            <ul>
+
+                {% for banner in banners %}
+                    <li data-transition="random-static" data-slotamount="7" data-masterspeed="1000"
+                        data-saveperformance="on">
+                        <img src="{{ MEDIA_URL }}{{ banner.image }}" width="1200" height="478"
+                             alt="{{ banner.title }}"/>
+                        <div class="tp-caption sfl title-slide center" data-x="40" data-y="100" data-speed="1000"
+                             data-start="1000" data-easing="Power3.easeInOut">
+                            {% if banner.title %}{{ banner.title }}{% endif %}<br>
+                            {% if banner.title2 %}{{ banner.title2 }}{% endif %}
+                        </div>
+                        <div class="tp-caption sfr desc-slide center" data-x="40" data-y="240" data-speed="1000"
+                             data-start="1500" data-easing="Power3.easeInOut">
+                            {% if banner.content %}{{ banner.content }}{% endif %}<br>
+                            {% if banner.content2 %}{{ banner.content2 }}{% endif %}<br>
+                        </div>
+                        <div class="tp-caption sfl flat-button-slider bg-button-slider-32bfc0" data-x="40" data-y="370"
+                             data-speed="1000" data-start="2000" data-easing="Power3.easeInOut"><a
+                                href="{% url 'about' %}">更多</a>&nbsp;&nbsp;&nbsp;&nbsp;<i
+                                class="fa fa-chevron-right"></i></div>
+
+                        <div class="tp-caption sfr flat-button-slider" data-x="225" data-y="370" data-speed="1000"
+                             data-start="2000" data-easing="Power3.easeInOut"><a
+                                href="{% url 'about' %}#contact">联系我们</a>&nbsp;&nbsp;&nbsp;&nbsp;<i
+                                class="fa fa-chevron-right"></i></div>
+                    </li>
+                {% endfor %}
+
+                {% if banners|length < 1 %}
+                    <li data-transition="random-static" data-slotamount="7" data-masterspeed="1000"
+                        data-saveperformance="on">
+                        <img src="{% static 'img/slides/1.jpg' %}" alt="slider-image"/>
+                        <div class="tp-caption sfl title-slide center" data-x="40" data-y="100" data-speed="1000"
+                             data-start="1000" data-easing="Power3.easeInOut">
+                            为客户提供最全面、最安全的<br>物流服务
+                        </div>
+                        <div class="tp-caption sfr desc-slide center" data-x="40" data-y="240" data-speed="1000"
+                             data-start="1500" data-easing="Power3.easeInOut">
+                            提供最高效、最快捷的<br>物流服务
+                        </div>
+                        <div class="tp-caption sfl flat-button-slider bg-button-slider-32bfc0" data-x="40" data-y="370"
+                             data-speed="1000" data-start="2000" data-easing="Power3.easeInOut"><a
+                                href="{% url 'about' %}">更多</a>&nbsp;&nbsp;&nbsp;&nbsp;<i
+                                class="fa fa-chevron-right"></i></div>
+
+                        <div class="tp-caption sfr flat-button-slider" data-x="225" data-y="370" data-speed="1000"
+                             data-start="2000" data-easing="Power3.easeInOut"><a
+                                href="{% url 'about' %}#contact">联系我们</a>&nbsp;&nbsp;&nbsp;&nbsp;<i
+                                class="fa fa-chevron-right"></i></div>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+    <!-- /.轮播图 -->
+
+    <!-- 搜索框 -->
+    <div class="flat-row pad-top60px pad-bottom10px">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-sm-offset-2 text-center">
+                    <form class="form-inline" role="search" action="/waybills/search/" method="get">
+                        <div class="form-group">
+                            <input type="text" class="form-control" style="background-color: white; min-width: 400px"
+                                   name="tracking_no" placeholder="运单查询">
+                            <input type="submit" class="btn btn-lg btn-primary" value="查询"/>
+                            <input type="hidden" name="pre"
+                                   value='{% block is_in_manage %}{% endblock is_in_manage %}'/>
+                            <input type="hidden" name='anonymous_tz' id="anonymous_tz"/>
+                        </div>
+                    </form>
+                </div><!-- /.col-md-12 -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div>
+    <!-- 搜索框 -->
+
+    <!-- 产品服务 -->
+    <div class="flat-row pad-top20px pad-bottom10px">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="flat-title-section style">我们提供的<span class="scheme">产品服务</span></h2>
+                </div><!-- /.col-md-12 -->
+            </div><!-- /.row -->
+            <div class="flat-divider d40px"></div>
+            <div class="row">
+                <div class="flat-wrapper">
+                    <div class="flat-iconbox-style clearfix">
+                        <div class="flat-item item-three-column">
+                            <div class="iconbox style1">
+                                <div class="box-header">
+                                    <div class="box-icon"><i class="fa fa-plane"></i></div>
+                                    <h5 class="box-title">进口直邮服务</h5>
+                                </div>
+                                <div class="box-content">
+                                    跨境电商清关渠道<br>稳定快捷, 速度有保障<br>多关口渠道清关
+                                </div>
+                            </div>
+                        </div><!-- /.item-three-column -->
+
+                        <div class="flat-item item-three-column">
+                            <div class="iconbox style1">
+                                <div class="box-header">
+                                    <div class="box-icon"><i class="fa fa-truck"></i></div>
+                                    <h5 class="box-title">行邮包裹清关服务</h5>
+                                </div>
+                                <div class="box-content">
+                                    海关免征额度以内个人用小包裹清关<br/>商品价值需在海关免征额度以内的包裹
+                                </div>
+                            </div>
+                        </div><!-- /.item-three-column -->
+
+                        <div class="flat-item item-three-column">
+                            <div class="iconbox style1">
+                                <div class="box-header">
+                                    <div class="box-icon"><i class="fa fa-dropbox"></i></div>
+                                    <h5 class="box-title">海外仓储服务</h5>
+                                </div>
+                                <div class="box-content">
+                                    现代化物流仓储<br>货物管理<br>订单配发
+                                </div>
+                            </div>
+                        </div><!-- /.item-three-column -->
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.container -->
+    </div>
+    <!-- /.产品服务 -->
+
+    <!-- 图片展示 -->
+    <div class="flat-row parallax-style parallax1">
+        <div class="overlay bg-scheme1"></div>
+        <div class="container">
+            <div class="row">
+                <div class="flat-wrapper">
+                    <div class="flat-imagebox clearfix">
+                        <div class="flat-item item-three-column">
+                            <div class="imagebox">
+                                <div class="box-wrapper">
+                                    <div class="box-image">
+                                        <img src="{% static 'img/imagebox/1.jpg' %}" alt="images">
+                                    </div>
+                                    <div class="box-header">
+                                        <h5 class="box-title">
+                                            <a href="services-detail.html">库内包裹处理</a>
+                                        </h5>
+                                    </div>
+                                    <div class="box-content">
+                                        <div class="box-desc">签收顾客邮寄包裹<br/>处理异常件<br/>审核内件商品并称重
+                                        </div>
+
+                                        <div class="box-button">
+                                            <a class="button bg-scheme3" href="{% url 'about' %}">更多<i
+                                                    class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /.imagebox -->
+                        </div><!-- /.item-three-column -->
+
+                        <div class="flat-item item-three-column">
+                            <div class="imagebox">
+                                <div class="box-wrapper">
+                                    <div class="box-image">
+                                        <img src="{% static 'img/imagebox/2.jpg' %}" alt="images">
+                                    </div>
+                                    <div class="box-header">
+                                        <h5 class="box-title">
+                                            <a href="services-detail-v1.html">集货处理</a>
+                                        </h5>
+                                    </div>
+                                    <div class="box-content">
+                                        <div class="box-desc">审核后的包裹<br>集货处理<br>
+                                        </div>
+                                        <div class="box-button">
+                                            <a class="button bg-scheme3" href="{% url 'about' %}">更多<i
+                                                    class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /.imagebox -->
+                        </div><!-- /.item-three-column -->
+
+                        <div class="flat-item item-three-column">
+                            <div class="imagebox">
+                                <div class="box-wrapper">
+                                    <div class="box-image">
+                                        <img src="{% static 'img/imagebox/3.jpg' %}" alt="images">
+                                    </div>
+                                    <div class="box-header">
+                                        <h5 class="box-title">
+                                            <a href="services-detail-v2.html">打板出库处理</a>
+                                        </h5>
+                                    </div>
+                                    <div class="box-content">
+                                        <div class="box-desc">根据航司要求<br>包裹成板<br>统一出库
+                                        </div>
+                                        <div class="box-button">
+                                            <a class="button bg-scheme3" href="{% url 'about' %}">更多<i
+                                                    class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /.imagebox -->
+                        </div><!-- /.item-three-column -->
+                    </div><!-- /.flat-imagebox -->
+                </div><!-- /.flat-wrapper -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div><!-- /.flat-row -->
+    <!-- /.图片展示 -->
+
+    <!-- 新闻公告  -->
+    {% if post_list|length > 0 %}
+        <div class="flat-row blog-shortcode blog-home pad-top60px pad-bottom0px">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="flat-title-section style mag-bottom0px">最近 <span class="scheme">
+                            <a href="{% url "blog-lists" %}" target="_parent">新闻公告</a> </span></h2>
+                    </div><!-- /.col-md-12 -->
+                </div><!-- /.row -->
+
+                <div class="row">
+                    <div class="content-wrap">
+                        <div class="main-content">
+                            <div class="main-content-wrap">
+                                <div class="content-inner clearfix">
+                                    {% for post in post_list %}
+                                        <article class="flat-item item-three-column blog-post">
+                                            <div class="entry-wrapper">
+                                                <div class="entry-header">
+                                                    <div class="entry-header-content">
+                                                        <h4 class="entry-title">
+                                                            <a href="{{ post.get_url }}">{{ post.title }}</a>
+                                                        </h4>
+                                                    </div><!-- /.entry-header-content -->
+                                                </div><!-- /.entry-header -->
+
+                                                <div class="entry-content">
+                                                    {# todo #}
+                                                    <p>{{ post.content | striptags | safe | slice:'30' }}...</p>
+                                                </div><!-- /.entry-content -->
+                                                <div class="entry-footer">
+                                                    <div class="entry-meta">
+                                                        <i class="fa fa-bell-o"></i>
+                                                        <span class="entry-author">{{ post.category.name }}</span>
+                                                        <i class="fa fa-calendar"></i>
+                                                        <span class="entry-categories">{{ post.create_dt }}</span>
+                                                    </div>
+                                                </div>
+                                            </div><!-- /.entry-wrapper -->
+                                        </article><!-- /.blog-post -->
+                                    {% endfor %}
+
+                                </div><!-- /.content-inner -->
+                            </div><!-- /.main-content-wrap -->
+                        </div><!-- /.main-content -->
+                    </div><!-- /.content-wrap  -->
+                </div><!-- /.row -->
+            </div><!-- /.container -->
+        </div><!-- /.flat-row -->
+    {% endif %}
+
+    <!-- 合作伙伴 -->
+    <div class="flat-row bg-scheme pad-top20px pad-bottom20px">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="clients-image style">
+                        <div class="item-img">
+                            <img src="{% static 'img/client/c1.png' %}" alt="images">
+                        </div>
+                        <p class="tooltip">合作伙伴: 韵达</p>
+                    </div>
+                </div><!-- /.col-md-2 -->
+
+                <div class="col-md-2">
+                    <div class="clients-image style">
+                        <div class="item-img">
+                            <img src="{% static 'img/client/c2.png' %}" alt="images">
+                        </div>
+                        <p class="tooltip">合作伙伴: 申通</p>
+                    </div>
+                </div><!-- /.col-md-2 -->
+
+                <div class="col-md-2">
+                    <div class="clients-image style">
+                        <div class="item-img">
+                            <img src="{% static 'img/client/c3.png' %}" alt="images">
+                        </div>
+                        <p class="tooltip">合作伙伴: EMS</p>
+                    </div>
+                </div><!-- /.col-md-2 -->
+
+                <div class="col-md-2">
+                    <div class="clients-image style">
+                        <div class="item-img">
+                            <img src="{% static 'img/client/c4.png' %}" alt="images">
+                        </div>
+                        <p class="tooltip">合作伙伴: FedEx</p>
+                    </div>
+                </div><!-- /.col-md-2 -->
+
+                <div class="col-md-2">
+                    <div class="clients-image style">
+                        <div class="item-img">
+                            <img src="{% static 'img/client/c5.png' %}" alt="images">
+                        </div>
+                        <p class="tooltip">合作伙伴: ups</p>
+                    </div>
+                </div><!-- /.col-md-2 -->
+
+                <div class="col-md-2">
+                    <div class="clients-image style">
+                        <div class="item-img">
+                            <img src="{% static 'img/client/c6.png' %}" alt="images">
+                        </div>
+                        <p class="tooltip">合作伙伴: DHL</p>
+                    </div>
+                </div><!-- /.col-md-2 -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div><!-- /.flat-row -->
+    <!-- 合作伙伴 -->
+
+{% endblock %}
+
+{% block header %}
+    {#    <header style="background-image: url({% static "img/bg.jpg" %}); width: 100%; background-size: cover; position: relative; min-height: 45%">#}
+    {#        <div class="header-content container" style="top:50%; padding: 50px;">#}
+    {#            <div class="header-content-inner" style="text-align: center; ">#}
+    {#                <h1 id="homeHeading" style="color: white;">士奇快递 HuskyEx </h1>#}
+    {#                <hr class="primary">#}
+    {#                <h5 style="color: whitesmoke">为客户提供最全面、最安全、最高效、最快捷的物流服务</h5>#}
+    {#                <div class="row">#}
+    {#                    <div class="col-xs-8 col-xs-push-2 col-sm-6 col-sm-push-3">#}
+    {#                        <form class="form-inline" role="search" action="/waybills/search/" method="get">#}
+    {#                            <div class="form-group ">#}
+    {#                                <input type="text" class="form-control" style="background-color: white"#}
+    {#                                       name="tracking_no" placeholder="运单查询">#}
+    {#                                <input type="submit" class="btn btn-lg btn-primary" value="查询"/>#}
+    {#                                <input type="hidden" name="pre"#}
+    {#                                       value='{% block is_in_manage %}{% endblock is_in_manage %}'/>#}
+    {#                                <input type="hidden" name='anonymous_tz' id="anonymous_tz"/>#}
+    {#                            </div>#}
+    {#                        </form>#}
+    {##}
+    {#                    </div>#}
+    {#                </div>#}
+    {#                <h5 style="color: whitesmoke">客服热线: (732)-317-4312</h5>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </header>#}
+{% endblock %}
+
+{% block content %}
+
+    {#    {% include "controls/slides.html" %}#}
+
+{#    <section id="partner" class="partner">#}
+{#        <div class="container">#}
+{#            <div class="row text-center">#}
+{#                <div class="col-lg-10 col-lg-offset-1">#}
+{#                    <h2>合作伙伴</h2>#}
+{#                    <hr class="primary">#}
+{#                    <div class="row">#}
+{#                        <div class="col-sm-2">#}
+{#                            <img class="img-responsive center-block" src="{% static "img/yunda.png" %}"#}
+{#                                 style="max-height: 60px">#}
+{#                        </div>#}
+{#                        <div class="col-sm-2">#}
+{#                            <img class="img-responsive center-block" src="{% static "img/shentong.png" %}"#}
+{#                                 style="max-height: 60px">#}
+{#                        </div>#}
+{#                        <div class="col-sm-2">#}
+{#                            <img class="img-responsive center-block" src="{% static "img/ems.png" %}"#}
+{#                                 style="max-height: 60px">#}
+{#                        </div>#}
+{#                        <div class="col-sm-2">#}
+{#                            <img class="img-responsive center-block" src="{% static "img/fedex.png" %}"#}
+{#                                 style="max-height: 60px">#}
+{#                        </div>#}
+{#                        <div class="col-sm-2">#}
+{#                            <img class="img-responsive center-block" src="{% static "img/ups_log.jpg" %}"#}
+{#                                 style="max-height: 60px">#}
+{#                        </div>#}
+{#                        <div class="col-sm-2">#}
+{#                            <img class="img-responsive center-block" src="{% static "img/dhl_logo.png" %}"#}
+{#                                 style="max-height: 60px">#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
+
+    <section id="contact" class="map">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-lg-10 col-lg-offset-1">
+                    <h2> </h2>
+                </div>
+                <div class="col-sm-4">
+                    <h4>工作时间</h4>
+                    <ul class="list-unstyled">
+                        <li>周一 10:00 - 18:00</li>
+                        <li>周二 10:00 - 18:00</li>
+                        <li>周三 10:00 - 18:00</li>
+                        <li>周四 10:00 - 18:00</li>
+                        <li>周五 10:00 - 18:00</li>
+                        <li>周六 10:00 - 18:00</li>
+                        <li>美国节假日除外</li>
+
+                    </ul>
+                </div>
+                <div class="col-sm-8">
+                    <img src="{% static 'img/map.png' %}" class="img img-responsive">
+                    {#                    <div id='myMap' style='width: 100%; height: 400px;'></div>#}
+                </div>
+
+            </div>
+        </div>
+
+
+        <br/>
+    </section>
+
+    {% include "controls/service_icon.html" %}
+
+{% endblock %}
+
+{% block footer %}{% include "controls/footer.html" %}{% endblock %}
+
+
+{% block scripts %}
+    {#    <script type='text/javascript'#}
+    {#            src='http://www.bing.com/api/maps/mapcontrol?branch=experimental&callback=loadMapScenario' async#}
+    {#            defer></script>#}
+
+    <script src="{% static 'js/owl.carousel.js' %}"></script>
+
+    <script src="{% static 'js/jquery-validate.js' %}"></script>
+{#    <script src="{% static 'js/switcher.js' %}"></script>#}
+    <!-- Revolution Slider -->
+    <script src="{% static 'js/jquery.themepunch.tools.min.js' %}"></script>
+    <script src="{% static 'js/jquery.themepunch.revolution.min.js' %}"></script>
+    <script src="{% static 'js/slider.js' %}"></script>
+
+    {#    <script type='text/javascript'>#}
+    {#        var map;#}
+    {#        function loadMapScenario() {#}
+    {#            map = new Microsoft.Maps.Map(document.getElementById('myMap'), {#}
+    {#                credentials: 'AnxZu1zi8dKpM6err9iTus4ccPlbfBfk3DDMDa6Kav4gTnkPRhgCMcVpkPDDhj-h',#}
+    {#                center: new Microsoft.Maps.Location(40.494795, -74.401773),#}
+    {#                navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,#}
+    {#                zoom: 12#}
+    {#            });#}
+    {#            var pushpin = new Microsoft.Maps.Pushpin(map.getCenter(), {#}
+    {#                color: 'rgb(0, 153, 255)',#}
+    {#                title: '士奇快递',#}
+    {#                text: 'H',#}
+    {#                enableHoverStyle: true, enableClickedStyle: true#}
+    {#            });#}
+    {#            map.entities.push(pushpin);#}
+    {#        }#}
+    {#    </script>#}
+    {#    <script>#}
+    {#        $(function () {#}
+    {#            loadMapScenario()#}
+    {#        })#}
+    {#    </script>#}
+{% endblock %}

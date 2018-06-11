@@ -1,0 +1,55 @@
+1 打印功能
+    2-3 h
+    查资料 20m
+        report lab 可以直接用, 但有commercial的版本, 免费版貌似有些东西需要搞清楚
+
+    实验  30m
+        点击 链接, pdf传回来 直接下载成文件或在浏览器预览pdf
+        如何生成多页
+    实现  30m
+    单个生成已经没有问题
+    缺少批量打印
+
+2 ajax 权限设置
+    10M
+    done
+    class view 解决 object level 问题
+    rest framework permission_classes 自定义isStaff
+
+3 运单管理
+    只显示本仓库未入库, 已入库的, 异常的订单  1h
+        bootstrap tab 怎么用
+
+    订单需要加loc    30M
+    用户地点选择筛选
+
+    具体detail操作未实现
+
+4 出库
+    托盘列表  1h
+        筛选
+        删除
+    新建批次  1H
+
+5 批次管理
+    批次列表 1h
+        筛选
+        删除
+    导出海关单 30M
+
+5 打板需增加重量 20M
+   done
+
+6 普通用户能进后台问题
+@login_required(login_url='/manage/login/')
+@user_passes_test(staffCheck, login_url='/')
+
+7 操作日志的问题
+
+8 时区自动识别问题
+解决
+设置中间件, 浏览器读取时区, session保存时区字段, 中间件负责切换当前时区
+
+9 django-table2  分页控件设置
+
+10 用户注册

@@ -1,0 +1,10 @@
+{% extends "waybills/customer_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+    <a href='{%  static 'xls/example.xls' %}'>模板文件（请在该文件的基础上进行编辑）</a>
+    {% crispy form %}
+
+    {% if excel_error  %}
+    {% endif %}
+{% endblock %}

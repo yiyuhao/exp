@@ -1,0 +1,289 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block head_title %}
+    批量出单
+{% endblock %}
+{% block content %}
+
+    {% crispy form form.helper %}
+    <div class="row">
+        <div class="col-sm-6">
+            <span>总计单数: <strong id="total_waybill_cnt">{{ total_waybill_cnt }}</strong> 单</span>
+            <span>A1: <strong id="total_a1">{{ total_a1 }}</strong> 单</span>
+            <span>K2: <strong id="total_a1">{{ total_k2 }}</strong> 单</span>
+            <span>Q : <strong id="total_q">{{ total_q }}</strong> 单</span>
+        </div>
+    </div>
+    {% if shelf_list != '' %}
+        <div class="row">
+            <div class="col-sm-12">
+                <button id="next_shelf_btn" class="btn btn-default">下一货架</button>
+                待出单货架:<span id="shelf_list">{{ shelf_list }}</span>
+            </div>
+        </div>
+        <br/>
+    {% endif %}
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="button" id="bulk_print_btn" class="btn btn-warning" value="批量出单"/>
+        </div>
+        <div class="col-sm-2">
+            {% if waybill_cnt > 0 %}
+                <span>共计: <span id="waybill_cnt">{{ waybill_cnt }}</span> 单</span><br/>
+                <span>其中: <span id="goods_cnt">{{ goods_cnt }}</span> 件商品</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-4" id="result"></div>
+        <div class="col-xs-12 col-sm-4" id="next_div_pic"></div>
+        <div class="col-xs-12 col-sm-4" id="next_div_des"></div>
+    </div>
+
+    {% render_table table %}
+
+    {% include "sound_alert_module.html" %}
+
+    <div id='auto_print_modal' class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">批量打印确认</h4>
+                </div>
+                <div id="action_modal_body" class="modal-body">
+                    <h3>当前页面可批量打印:
+                        <strong><span style="color: red;" id="total_print_cnt"></span></strong>
+                        单<br/>
+                        其中商品总件数:
+                        <strong> <span style="color: red;" id="total_goods_cnt"></span></strong>
+                        件<br/>
+                        确认批量打印吗?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirm_print_btn" type="button" class="btn btn-primary" data-dismiss="modal">确认
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            set_up_datepicker();
+            select_all_populate();
+
+            var waybill_cnt = $('#waybill_cnt');
+            var goods_cnt = $('#goods_cnt');
+            var bulk_print_btn = $('#bulk_print_btn');
+            var auto_print_modal = $('#auto_print_modal');
+            var total_print_cnt = $('#total_print_cnt');
+            var total_goods_cnt = $('#total_goods_cnt');
+            var confirm_print_btn = $('#confirm_print_btn');
+            var result = $('#result');
+            var goods_no_input = $('#id_goods_no');
+            var next_div_pic = $('#next_div_pic');
+            var next_div_des = $('#next_div_des');
+            var shelf_no_input = $('#id_shelf_no');
+            var loc = $('#id_src_loc');
+            var current_next_index = 0;
+            var next_shelf_btn = $('#next_shelf_btn');
+            var shelf_list = $('#shelf_list');
+            var shelf_no_list = [];
+            var current_shelf_no_index = 0;
+            var in_no = $('#id_in_no');
+            var search_btn = $('#submit-id-');
+            var channel = $('#id_channel');
+            var dt_input = $('#id_dt');
+
+            search_btn.click(function () {
+                if (loc.val() == "") {
+                    alert('请选择仓库地');
+                    return false
+                }
+
+                {#                if (channel.val() == "") {#}
+                {#                    alert('渠道');#}
+                {#                    return false#}
+                {#                }#}
+            });
+
+            bulk_print_btn.click(function () {
+                waybill_id_list = [];
+                $('td.cb > input').each(function () {
+                    if ($(this).prop('checked')) {
+                        waybill_id_list.push(parseInt($(this).val()))
+                    }
+                });
+
+                if (waybill_id_list.length > 0) {
+                    data = new FormData();
+                    data.append('id_list', waybill_id_list);
+                    data.append('shelf_no', shelf_no_input.val());
+                    data.append('loc', loc.val());
+                    data.append('in_no', in_no.val());
+                    data.append('channel_name', channel.val());
+                    data.append('dt', dt_input.val());
+
+                    $.ajax({
+                        url: '/api-ajax/get-waybills-bulk-print/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            //console.log(data);
+                            if (data.url != "") {
+                                w = window.open(data.url);
+                                setTimeout(function () {
+                                    w.close();
+                                }, 6000);
+                                goods_no_input.select();
+
+                                if (data.next.sku != "") {
+                                    next_div_pic.empty();
+                                    next_div_pic.append(render_next_pic(data.next));
+                                    next_div_des.empty();
+                                    next_div_des.append(render_next_des(data.next));
+                                    bind_next_btn(data.next);
+                                }
+                            }
+                            result.empty();
+                            result.append(render_result(data));
+
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                }
+
+                return false
+            });
+
+            confirm_print_btn.click(function () {
+                $('th.cb > input').prop('checked', true);
+                $('td.cb > input').each(function () {
+                    $(this).prop('checked', true);
+                });
+                bulk_print_btn.trigger('click');
+            });
+
+            render_auto_print_modal();
+
+            get_shelf_no_list();
+
+            bind_next_shelf_btn();
+            //action_modal.on('hide.bs.modal', function () {
+            //    location.reload();
+            //});
+
+            $('.status').popover();
+
+            function render_auto_print_modal() {
+                if (waybill_cnt.length > 0 && goods_no_input.val().trim() !== '') {
+                    var curr_page_row = $('td.cb > input').length;
+                    var waybill_qty_ = parseInt(waybill_cnt.text());
+                    total_print_cnt.text(Math.min(curr_page_row, waybill_qty_));
+                    total_goods_cnt.text(goods_cnt.text());
+                    auto_print_modal.modal('show');
+                    confirm_print_btn.focus();
+                }
+
+            }
+
+            function render_result(data) {
+                var succ = "";
+                var fail = "";
+                var link = "";
+
+                $(data.succ_list).each(function () {
+                    succ += '<li>' + this.tracking_no + '   ' + this.msg + '</li>'
+                });
+                if (succ !== "") {
+                    succ = "<span class='label label-success'> 成功 "
+                        + data.succ_list.length + " 单:</span> <br/>"
+                        + '<ol>' + succ + '</ol>';
+                    link = "<a target='_blank' href='" + data.url + "' >面单下载地址</a>"
+                }
+
+                $(data.fail_list).each(function () {
+                    fail += '<li>' + this.tracking_no + '   ' + this.msg + '</li>'
+                });
+                if (fail !== "") {
+                    fail = "<span class='label label-danger'> 失败 "
+                        + data.fail_list.length + " 单:</span><br/>"
+                        + '<ol>' + fail + '</ol>';
+                }
+                return $("<div>"
+                    + data.msg + link
+                    + "<br/>"
+                    + succ
+                    + '<br />'
+                    + fail
+                    + "</div>"
+                );
+
+            }
+
+            function render_next_pic(next_obj) {
+                return $(
+                    "<span> 下一个商品:  <button class='btn btn-default' id='next_btn'>换一个</button><br/>" +
+                    "<img id='next_img' class='img' src='" + next_obj.img_url + "' style='max-width:300px; max-height:300px'/>"
+                );
+            }
+
+            function render_next_des(next_obj) {
+                return $(
+                    "<h3><strong><span id='next_sku'>" + next_obj.sku + "</span></storng></h3></span> <br/>" +
+                    "<h3><span id='next_des'>" + next_obj.des + "</span></h3>" +
+                    "<h3><span id='next_total_qty'>" + "商品件数: " + next_obj.total_qty + "</span></h3>"
+                );
+            }
+
+            function bind_next_btn(next) {
+                if (next.list.length > 0) {
+                    var next_btn = $('#next_btn');
+                    next_btn.unbind();
+                    next_btn.click(function () {
+                        current_next_index += 1;
+                        $('#next_sku').text(next.list[current_next_index % next.list.length].sku);
+                        $('#next_des').text(next.list[current_next_index % next.list.length].des);
+                        $('#next_total_qty').text("商品件数: " + next.list[current_next_index % next.list.length].total_qty);
+                        $('#next_img').attr('src', next.list[current_next_index % next.list.length].img_url);
+                    });
+                }
+            }
+
+            function get_shelf_no_list() {
+                if (shelf_list.length > 0) {
+                    shelf_no_list = shelf_list.text().split(',').map(Function.prototype.call, String.prototype.trim);
+
+                    if (shelf_no_input.val() !== "") {
+                        current_shelf_no_index = shelf_no_list.indexOf(shelf_no_input.val().toUpperCase()) + 1;
+                    }
+                }
+            }
+
+            function bind_next_shelf_btn() {
+                if (next_shelf_btn.length > 0) {
+                    next_shelf_btn.click(function () {
+                        shelf_no_input.val(shelf_no_list[current_shelf_no_index % shelf_no_list.length]);
+                        current_shelf_no_index += 1;
+                        search_btn.trigger('click');
+                    });
+                }
+            }
+
+        })
+    </script>
+{% endblock %}

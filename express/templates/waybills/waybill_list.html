@@ -1,0 +1,95 @@
+{% extends "waybills/customer_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block css %}
+    <style type="text/css">
+        .delete > a {
+            color: red
+        }
+    </style>
+
+{% endblock css %}
+
+
+{% block content %}
+
+    {% crispy form form.helper %}
+
+    {% crispy form_action %}
+
+    {% render_table table %}
+
+
+    <div class="modal" id="delete_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="delete_modal_text" style="text-align: center"></h5>
+                    <p id="delete_modal_fail_message" style="display: none; color: red;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="delete_modal_confirm" type="button" class="btn btn-danger">确认删除吗</button>
+                    <input id="delete_modal_url" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            var delete_modal =$('#delete_modal');
+
+            delete_modal.modal('hide');
+
+            $('.delete > a').click(function (e) {
+                e.preventDefault();
+                tracking_no = $(this).closest("tr").find(".tracking_no").text();
+                delete_url = $(this).closest("tr").find(".delete>a").attr("href");
+
+                $('#delete_modal_url').val(delete_url);
+                $('#delete_modal_text').html("确认要删除运单：<strong>" + tracking_no + "</strong>?");
+                $('#delete_modal_fail_message').text("");
+                delete_modal.modal('show');
+
+                return false
+            });
+
+            $("#delete_modal_confirm").click(function () {
+                var delete_url = $('#delete_modal_url').val();
+                {#                var csrftoken = getCookie('csrftoken');#}
+
+                $.ajax({
+                    url: delete_url,
+                    method: 'Delete',
+                    success: function () {
+                        console.log("delete success");
+                        delete_modal.modal("hide");
+                        location.reload();
+                    },
+                    error: function (res) {
+                        console.log(res["responseJSON"].detail);
+                        $("#delete_modal_fail_message").text("删除失败：  " + res["responseJSON"].detail);
+                        $("#delete_modal_fail_message").show()
+                    }
+
+                })
+            });
+
+            $('.printBtn > a').each(function () {
+                $(this).attr('target', '_blank')
+            });
+
+
+            // checkbox all select or deselect
+            select_all_populate();
+
+        });
+    </script>
+{% endblock %}

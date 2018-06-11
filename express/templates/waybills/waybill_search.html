@@ -1,0 +1,65 @@
+{% extends base_template %}
+{% load static %}
+{% load tz %}
+
+
+{% block css %}
+    <style type="text/css">
+
+    </style>
+
+{% endblock css %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-8 col-sm-push-2">
+            {% if manage %} <p> 您所在的时区: {{ current_timezone }}, 以下时间为您所在时区的时间 {% endif %}
+            </p>
+            <table class="table table-striped table-hover">
+                <tbody>
+                {% for waybill in data.waybills %}
+                    {% if waybill.is_error and not manage %}
+                        <tr class="danger">
+                            <th colspan="2">运单 {{ waybill.tracking_no }} 状态异常</th>
+                        </tr>
+                    {% elif waybill.status_set|length > 0 %}
+                        <tr class="success">
+                            <th colspan="2">运单 {{ waybill.tracking_no }} 信息如下
+                                {% if waybill.is_overtime %}
+                                    <small style="color: red"><i class="fa fa-exclamation-triangle"></i> 如物流长时间未更新,
+                                        请联系客服
+                                    </small> {% endif %}
+                            </th>
+                        </tr>
+                        {% if waybill.has_person_id  and waybill.person_id_update_dt %}
+                            <tr>
+                                <td colspan="2">顾客上传身份证时间: {{ waybill.person_id_update_dt }}</td>
+                            </tr>
+                        {% endif %}
+                        {% for status in waybill.status_set %}
+                            <tr>
+                                <td>{{ status.create_dt }}</td>
+                                <td>{{ status.status__name }}
+                                    {% if manage and status.remark %} 备注: {{ status.remark }} {% endif %}
+                                    {% if not waybill.has_person_id %}
+                                        ,待收件人上传身份证
+                                        <a href="/u/?m={{ waybill.tracking_no }}" class="btn btn-success btn-sm">
+                                            <i class="fa fa-upload"></i>自助上传</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="danger">
+                            <th colspan="2">运单 {{ waybill.tracking_no }} 没有查询到运单信息</th>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}{% include "controls/footer.html" %}{% endblock %}

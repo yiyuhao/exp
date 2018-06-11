@@ -1,0 +1,32 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-4 col-sm-push-4">
+            <form method="post" action="{% url 'manage-login' %}">
+                {% csrf_token %}
+                {{ form | crispy }}
+
+                <input class="btn btn-primary" type="submit" value="login"/>
+                <input type="hidden" name="next" value="{{ next }}"/>
+                <input type="hidden" id='user_tz' name="user_tz"/>
+            </form>
+
+            {# Assumes you setup the password_reset view in your URLconf #}
+{#            <p><a href="{% url 'password_reset' %}">忘记密码?</a></p>#}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/jstz.min.js" %}'></script>
+
+    <script>
+    $(function () {
+        console.log(jstz.determine().name());
+        $('#user_tz').val(jstz.determine().name())
+    })
+    </script>
+{% endblock %}

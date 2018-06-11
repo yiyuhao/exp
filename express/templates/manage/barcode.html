@@ -1,0 +1,50 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    打条码
+{% endblock %}
+{% block content %}
+    <div class="col-md-3">
+        <div class="col-xs-12">
+            <label for="tracking_no_input">输入条码</label>
+            <input type="text" id="barcode_input" name="barcode" style="width: 100%;"/>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            var barcode_input = $('#barcode_input');
+
+            barcode_input.keyup(function (e) {
+                if (e.keyCode == 13) {
+                    do_something($(this).val());
+                    $(this).select()
+                }
+            });
+
+
+            function do_something(input) {
+                barcode = input.trim();
+                if (barcode != "") {
+
+
+                    var wnd = window.open(barcode, '_blank');
+
+                    //自动关闭
+                    setTimeout(function () {
+                        wnd.close();
+                    }, 5000);
+                }
+            }
+
+
+        })
+    </script>
+
+{% endblock %}

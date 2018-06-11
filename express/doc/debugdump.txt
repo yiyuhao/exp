@@ -1,0 +1,63 @@
+== Info:   Trying ::1...
+== Info: TCP_NODELAY set
+== Info: Connection failed
+== Info: connect to ::1 port 8000 failed: Connection refused
+== Info:   Trying 127.0.0.1...
+== Info: TCP_NODELAY set
+== Info: Connected to localhost (127.0.0.1) port 8000 (#0)
+=> Send header, 242 bytes (0xf2)
+0000: POST /api/waybill_bulk_create/ HTTP/1.1
+0029: Host: localhost:8000
+003f: User-Agent: curl/7.51.0
+0058: Accept: */*
+0065: Authorization: Token ccf2ced9ee72c7eb94318cbaf1ef412a9f010ac1
+00a4: Content-Type: application/json
+00c4: Content-Length: 1153
+00da: Expect: 100-continue
+00f0: 
+== Info: Done waiting for 100-continue
+=> Send data, 1153 bytes (0x481)
+0000: {"waybills":[{"tracking_no":"JH17010199999","weight":"-2","init_
+0040: loc":1,"recv_province":".........","recv_city":".........","recv
+0080: _area":".........","recv_address":"...............","recv_zipcod
+00c0: e":"12321","recv_name":"......","recv_mobile":"1380001233","send
+0100: _name":"Mary Chang","send_mobile":"899123200023","send_address":
+0140: "13  Garabedian Dr","order_no":"","remark":"","person_id":"","go
+0180: ods":[{"unit_weight":"2.00","unit_price":"15.00","spec":"nanbao"
+01c0: ,"brand":"coach","quantity":1,"hs_type":"","hs_type_no":"","sku"
+0200: :"8886","description":"...","english_name":"","unit":"","remark"
+0240: :""}]},{"tracking_no":"JH17010199999","weight":"2","init_loc":1,
+0280: "recv_province":".........","recv_city":".........","recv_area":
+02c0: ".........","recv_address":"...............","recv_zipcode":"123
+0300: 21","recv_name":"......","recv_mobile":"1380001233","send_name":
+0340: "Mary Chang","send_mobile":"899123200023","send_address":"13  Ga
+0380: rabedian Dr","order_no":"","remark":"","person_id":"","goods":[{
+03c0: "unit_weight":"2.00","unit_price":"15.00","spec":"nanbao","brand
+0400: ":"coach","quantity":1,"hs_type":"","hs_type_no":"","sku":"8886"
+0440: ,"description":"...","english_name":"","unit":"","remark":""}]}]
+0480: }
+== Info: We are completely uploaded and fine
+== Info: HTTP 1.0, assume close after body
+<= Recv header, 26 bytes (0x1a)
+0000: HTTP/1.0 400 Bad Request
+<= Recv header, 37 bytes (0x25)
+0000: Date: Thu, 23 Feb 2017 01:56:28 GMT
+<= Recv header, 38 bytes (0x26)
+0000: Server: WSGIServer/0.1 Python/2.7.10
+<= Recv header, 22 bytes (0x16)
+0000: Vary: Accept, Cookie
+<= Recv header, 29 bytes (0x1d)
+0000: X-Frame-Options: SAMEORIGIN
+<= Recv header, 32 bytes (0x20)
+0000: Content-Type: application/json
+<= Recv header, 22 bytes (0x16)
+0000: Allow: POST, OPTIONS
+<= Recv header, 2 bytes (0x2)
+0000: 
+<= Recv data, 215 bytes (0xd7)
+0000: {"code":1,"msg":"...........................","data":[{"tracking
+0040: _no":"JH17010199999","msg":{"weight":["..................0"]},"c
+0080: ode":1,"order_no":""},{"tracking_no":"JH17010199999","msg":"","c
+00c0: ode":0,"order_no":""}]}
+== Info: Curl_http_done: called premature == 0
+== Info: Closing connection 0

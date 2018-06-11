@@ -1,0 +1,174 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block head_title %} 托盘管理 {% endblock %}
+
+{% block css %}
+    <style type="text/css">
+        .delete > a {
+            color: red
+        }
+    </style>
+
+{% endblock css %}
+
+
+{% block content %}
+    {% crispy form form.helper %}
+
+    {#    {% crispy form_action %}#}
+
+    <div style="display: inline;">
+        <select id="sel_action">
+            <option value="0">-------------</option>
+            <option value="生成提单">生成提单</option>
+        </select>
+        <input type="button" class="btn btn-primary" id="exe_btn" value="执行"/>
+        <p class="label"></p>
+    </div>
+
+    <div style="margin: 5px"></div>
+
+    {% render_table table %}
+
+    <div class="modal" id="delete_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="delete_modal_text" style="text-align: center"></h5>
+                    <p id="delete_modal_fail_message" style="display: none; color: red;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="delete_modal_confirm" type="button" class="btn btn-danger">确认删除吗</button>
+                    <input id="delete_modal_url" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="create_air_waybill_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="create_air_waybill_modal_text" style="text-align: center">生成提单</h5>
+                    <p id="create_air_waybill_modal_fail_message" style="display: none; color: red;"></p>
+                    <div id="create_air_waybill_modal_pallet_no"></div>
+                    <label>自定义航空提单号</label>
+                    <input type="text" id="air_waybill_no"/><br/>
+                    <label for="channel">选择渠道*</label>
+                    <select name="channel" id="channel_select" style="width:100%;">
+                        <option value="0">--------</option>
+                        {% for channel in channels %}
+                            <option value="{{ channel.id }}">{{ channel.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <p id="create_air_waybill_modal_result"></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="create_air_waybill_modal_cancel" type="button" class="btn btn-default"
+                            data-dismiss="modal">取消
+                    </button>
+                    <button id="create_air_waybill_modal_confirm" type="button" class="btn btn-danger">确认</button>
+                    <input id="create_air_waybill_modal_url" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            select_all_populate();
+            ajaxSetup();
+
+            set_up_datepicker();
+
+            code = {
+                0: "填单创建成功:",
+                1: "存在有问题的托盘号",
+                2: "系统错误, 请重试"
+            };
+            css = {
+                0: "success",
+                1: "danger",
+                2: "danger"
+            };
+
+            var exe_btn = $("#exe_btn");
+            var action_sel = $('#sel_action');
+            var pallet_no_list_div = $('#create_air_waybill_modal_pallet_no');
+            var create_air_waybill_result_p = $('#create_air_waybill_modal_result');
+            var create_air_waybill_model = $('#create_air_waybill_modal');
+            var create_air_waybill_confirm_btn = $('#create_air_waybill_modal_confirm');
+            var air_waybill_no_input = $('#air_waybill_no');
+            var channel_select = $('#channel_select');
+            exe_btn.click(function () {
+                var option = action_sel.val();
+                if (option == 0) {
+                    return false
+                } else if (option == "生成提单") {
+                    pallet_no_list_div.empty();
+                    create_air_waybill_result_p.text("").attr("class", "");
+
+                    if (count_selected() <= 0) {
+                        return false;
+                    } else {
+                        td_cb = $('td.cb > input');
+                        html = "";
+                        td_cb.each(function () {
+                            if ($(this).prop('checked') == true) {
+                                pallet_no = $(this).closest('tr').find('.pallet_no').text();
+                                channel = $(this).closest('tr').find('.channel').text().trim();
+
+                                html +=
+                                    "<li>" +
+                                    pallet_no + " : " + channel +
+                                    "</li>";
+                                channel_select.find("option:contains('" + channel + "')").attr("selected", true);
+                            }
+                        });
+                        pallet_no_list_div.append("<ol>" + html + "</ol>")
+                    }
+                }
+                create_air_waybill_model.modal('show');
+                return false;
+            });
+
+            create_air_waybill_confirm_btn.click(function () {
+                lis = pallet_no_list_div.find("li");
+                pallet_nos = [];
+                lis.each(function () {
+                    pallet_nos.push($(this).text().split(':')[0].trim())
+                });
+                console.log(pallet_nos);
+
+                air_waybill_no = air_waybill_no_input.val().trim();
+
+                channel_id = channel_select.val();
+
+                if (pallet_nos.length > 0) {
+                    pallet_nos_str = pallet_nos.join(',');
+                    $.post("/api-ajax/air-waybill-create/", {
+                        "pallets": pallet_nos_str,
+                        'air_waybill_no': air_waybill_no,
+                        'channel_id': channel_id
+                    }, function (data) {
+                        if (data.code == 0) {
+                            location.reload();
+                        } else {
+                            ajax_return_alert(create_air_waybill_result_p, css[data.code], data.msg)
+                        }
+
+                    });
+                }
+                return false
+            });
+        })
+    </script>
+{% endblock %}

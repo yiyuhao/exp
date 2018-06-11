@@ -1,0 +1,109 @@
+{% load staticfiles %}
+<html>
+<head>
+    <title>
+        {% block head_title %}
+        {% endblock head_title %}
+    </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='{% static 'vendor/font-awesome/css/font-awesome.min.css' %}'>
+    <link rel='stylesheet' href='{% static "css/bootstrap.min.css" %}'/>
+    <link rel='stylesheet' href='{% static "css/jquery-ui.min.css" %}'/>
+    {% block css %}{% endblock css %}
+    <style>
+        #global_modal {
+            display: none;
+            position: fixed;
+            z-index: 1100;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255, 255, 255, .8) url({% static 'img/loading.gif' %}) 50% 50% no-repeat;
+        }
+
+        /* When the body has the loading class, we turn
+       the scrollbar off with overflow:hidden */
+        body.loading {
+            overflow: hidden;
+        }
+
+        /* Anytime the body has the loading class, our
+           modal element will be visible */
+        body.loading #global_modal {
+            display: block;
+        }
+        .navbar {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    <nav class="navbar {% block navbar_style %}{% endblock navbar_style %}">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% block index_url %}/{% endblock index_url %}">{% block brand %}
+                    士奇快递{% endblock brand %} </a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                <form class="navbar-form navbar-left" role="search" action="/waybills/search/" method="get">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="tracking_no" placeholder="运单查询">
+                        <input type="hidden" name="pre"
+                               value='{% block is_in_manage %}{% endblock is_in_manage %}'/>
+                        <input type="hidden" name='anonymous_tz' id="anonymous_tz"/>
+                    </div>
+                    <button type="submit" class="btn btn-default btn-lg">
+                        <i class="fa fa-search"></i></button>
+                </form>
+                {% block role-function %}
+                {% endblock %}
+            </div>
+        </div>
+    </nav>
+    {% block header %}{% endblock header %}
+    <div class="container">
+        {% include "messages_display.html" %}
+    </div>
+    <div class="container">
+        {% block content %}{% endblock content %}
+    </div>
+</div>
+<div class="modal" id="global_modal"></div>
+
+</body>
+<script src='{% static 'js/jquery-1.12.4.min.js' %}'></script>
+<script src='{% static 'js/bootstrap.min.js' %}'></script>
+<script src='{% static 'js/jquery-ui.min.js' %}'></script>
+
+{% block scripts %}{% endblock %}
+</html>
+<script src='{% static "js/jstz.min.js" %}'></script>
+
+<script>
+    $(function () {
+        // messages auto hide
+        if ($('ul.messages').length) {
+            if ($('li.allert-success').length) {
+                $('ul.messages').delay(3000).fadeOut()
+            } else {
+                ;
+            }
+        }
+        // anonymous_tz
+        $('#anonymous_tz').val(jstz.determine().name())
+    })
+</script>

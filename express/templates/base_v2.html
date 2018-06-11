@@ -1,0 +1,255 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<!--[if IE 8 ]><html class="ie" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"><!--<![endif]-->
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <title>
+        {% block head_title %}{% endblock head_title %}
+    </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="themesflat.com">
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!-- old base.html -->
+    <link rel='stylesheet' href='{% static 'vendor/font-awesome/css/font-awesome.min.css' %}'>
+    <link rel='stylesheet' href='{% static "css/bootstrap.min.css" %}'/>
+    <link rel='stylesheet' href='{% static "css/jquery-ui.min.css" %}'/>
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <!-- Theme Style -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <!-- Responsive -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/responsive.css' %}">
+    <!-- Animation Style -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/animate.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/id_card.css' %}">
+
+    {% block css %}{% endblock css %}
+
+    <!-- Favicon and touch icons  -->
+    <link href="{% static 'icon/apple-touch-icon-48-precomposed.png' %}" rel="apple-touch-icon-precomposed"
+          sizes="48x48">
+    <link href="{% static 'icon/apple-touch-icon-32-precomposed.png' %}" rel="apple-touch-icon-precomposed">
+    <link href="{% static 'icon/favicon.png' %}" rel="shortcut icon">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        #global_modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255, 255, 255, .8) url({% static 'img/loading.gif' %}) 50% 50% no-repeat;
+        }
+
+        /* When the body has the loading class, we turn
+       the scrollbar off with overflow:hidden */
+        body.loading {
+            overflow: hidden;
+        }
+
+        /* Anytime the body has the loading class, our
+           modal element will be visible */
+        body.loading #global_modal {
+            display: block;
+        }
+
+        .navbar {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+
+<body class="header-sticky page-loading header-v2">
+<div class="loading-overlay">
+</div>
+
+<!-- Boxed -->
+<div class="boxed">
+
+    <div class="site-header header-v2">
+        <div class="flat-top">
+            {#                        <div class="container">#}
+            {#                            <div class="row">#}
+            {#                                <div class="flat-wrapper">#}
+            {#                                    <div class="custom-info">#}
+            {#                                        <span>Have any questions?</span>#}
+            {#                                        <span><i class="fa fa-reply"></i>themesflat@gmail.com</span>#}
+            {#                                        <span><i class="fa fa-map-marker"></i>66 Nicholson St Buffalo New York US</span>#}
+            {#                                        <span><i class="fa fa-phone"></i>+ 012 222 989899</span>#}
+            {#                                    </div>#}
+            {##}
+            {#                                    <div class="social-links">#}
+            {#                                        <a href="#">#}
+            {#                                            <i class="fa fa-twitter"></i>#}
+            {#                                        </a>#}
+            {##}
+            {#                                        <a href="#">#}
+            {#                                            <i class="fa fa-google-plus"></i>#}
+            {#                                        </a>#}
+            {#                                        <a href="#">#}
+            {#                                            <i class="fa fa-pinterest"></i>#}
+            {#                                        </a>#}
+            {#                                    </div>#}
+            {#                                </div><!-- /.flat-wrapper -->#}
+            {#                            </div><!-- /.row -->#}
+            {#                        </div><!-- /.container -->#}
+        </div><!-- /.flat-top -->
+
+
+        <header id="header" class="header">
+            <div class="header-wrap">
+                <div id="logo" class="logo">
+                    <a href="{% url 'index' %}">
+                        <img src="{% static 'img/logo.png' %}" alt="images">
+                    </a>
+                </div><!-- /.logo -->
+                <div class="btn-menu">
+                    <span></span>
+                </div><!-- //mobile menu button -->
+
+                <!-- 导航 -->
+                <div class="nav-wrap">
+                    <nav id="mainnav" class="mainnav">
+                        <div class="menu-extra">
+                            <ul>
+                                <li id="s" class="search-box">
+                                    <a href="#search" class="flat-search"><i class="fa fa-search"></i></a>
+                                    <div class="submenu top-search">
+                                        <div class="widget widget_search">
+                                            <form class="search-form" role="search" action="/waybills/search/"
+                                                  method="get">
+                                                <input type="search" class="search-field" name="tracking_no"
+                                                       placeholder="运单查询...">
+                                                <input type="submit" class="search-submit">
+                                                <input type="hidden" name="pre" value="">
+                                                <input type="hidden" name="anonymous_tz" id="anonymous_tz">
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div><!-- /.menu-extra -->
+
+                        <ul class="menu">
+                            <li><a href='{% url "upload-person-id" %}'>上传身份证信息</a></li>
+
+                            {% if not request.user.is_authenticated %}
+                                <li><a href='{% url "blog-lists" %}'>新闻公告</a></li>
+                                <li><a href='{% url "service" %}'>服务支持</a></li>
+                                <li><a href='{% url "about" %}'>关于士奇</a></li>
+                                <li><a href='{% url "login" %}'>登陆</a></li>
+
+                            {% else %}
+                                <li><a href='{% url "customer_waybill_list" %}'>运单管理</a></li>
+                                <li><a href='{% url "customer_waybill_create" %}'>单个建单</a></li>
+                                <li><a href='{% url "customer_waybill_bulk_create" %}'>批量建单</a></li>
+
+                                <li><a href="/accounts/profile/">{{ request.user }}</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-expanded="false">快递<span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href='{% url "blog-lists" %}'>新闻公告</a></li>
+                                        <li><a href='{% url "service" %}'>服务支持</a></li>
+                                        <li><a href="{% url "about" %}">关于士奇</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href='{% url "logout" %}'>登出</a></li>
+                            {% endif %}
+                        </ul><!-- /.menu -->
+                    </nav><!-- /.mainnav -->
+                </div><!-- /.nav-wrap -->
+            </div><!-- /.header-wrap -->
+        </header><!-- /.header -->
+    </div><!-- /.site-header -->
+
+    {% block header_blank %}
+        <div style="margin-top: 60px"></div>
+    {% endblock %}
+
+
+    {#    <div class="page-breadcrumbs">#}
+    {#        <div class="container">#}
+    {#            <div class="row">#}
+    {#                <div class="flat-wrapper">#}
+    {#                    <div class="breadcrumbs">#}
+    {#                        <ul class="trail-items">#}
+    {#                            <li class="trail-item"><a href="index-v2.html">主页</a></li>#}
+    {#                            <li>运单管理</li>#}
+    {#                        </ul>#}
+    {#                    </div><!-- /.breadcrumbs -->#}
+    {#                </div><!-- /.flat-wrapper -->#}
+    {#            </div><!-- /.row -->#}
+    {#        </div><!-- /.container -->#}
+    {#    </div><!-- /.page-breadcrumbs -->#}
+
+    {% block boxed %}{# page-header... #}{% endblock %}
+
+    {# old base #}
+    <div class="page-container">
+        {% block header %}{% endblock header %}
+        <div class="container">
+            {% include "messages_display.html" %}
+        </div>
+        <div class="container">
+            {% block content %}{% endblock content %}
+        </div>
+    </div>
+    <div class="modal" id="global_modal"></div>
+
+    {% block footer %}{% endblock %}
+
+    <!-- Go Top -->
+    <a class="go-top">
+        <i class="fa fa-chevron-up"></i>
+    </a>
+
+</div>
+
+<!-- Javascript -->
+<script src='{% static 'js/jquery-1.12.4.min.js' %}'></script>
+<script src='{% static 'js/bootstrap.min.js' %}'></script>
+<script src='{% static 'js/jquery-ui.min.js' %}'></script>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/jquery.easing.js' %}"></script>
+<script src="{% static 'js/jquery-waypoints.js' %}"></script>
+<script src="{% static 'js/jquery-countTo.js' %}"></script>
+<script src="{% static 'js/jquery.cookie.js' %}"></script>
+<script src="{% static 'js/parallax.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
+
+<script src='{% static "js/jstz.min.js" %}'></script>
+
+<script>
+    $(function () {
+        // messages auto hide
+        if ($('ul.messages').length) {
+            if ($('li.allert-success').length) {
+                $('ul.messages').delay(3000).fadeOut()
+            } else {
+                ;
+            }
+        }
+        // anonymous_tz
+        $('#anonymous_tz').val(jstz.determine().name())
+    })
+</script>

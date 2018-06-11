@@ -1,0 +1,109 @@
+{% extends "waybills/customer_base.html" %}
+
+{% block head_title %}
+    公告
+{% endblock %}
+
+{% block boxed %}
+    <div class="blog">
+        <div class="container">
+            <div class="row">
+                <div class="content-wrap">
+                    <div class="main-content">
+                        <div class="main-content-wrap">
+                            <div class="content-inner">
+                                {% if post_list|length > 0 %}
+                                    {% for post in post_list %}
+                                        <article class="blog-post">
+                                            <div class="entry-wrapper">
+                                                <h4 class="entry-time">
+                                                    <span class="entry-month">{{ post.create_dt.month }}月</span>
+                                                    <span class="entry-day">{{ post.create_dt.day }}</span>
+                                                </h4>
+
+                                                <div class="entry-header">
+                                                    <div class="entry-header-content">
+                                                        <h4 class="entry-title">
+                                                            <a href="{{ post.get_url }}">{{ post.title }}</a>
+                                                        </h4>
+                                                        <div class="entry-meta">
+                                                            <i class="fa fa-bell-o"></i>
+                                                            <span class="entry-author">{{ post.category.name }}</span>
+                                                            <i class="fa fa-calendar"></i>
+                                                            <span class="entry-categories">{{ post.create_dt }}</span>
+                                                        </div>
+                                                    </div><!-- /.entry-header-content -->
+                                                </div><!-- /.entry-header -->
+
+                                                <div class="entry-content">
+                                                    <p>
+                                                    <p>{{ post.content | striptags | safe  | slice:'500' }}...</p>
+                                                    <div class="readmore"><a href="{{ post.get_url }}"
+                                                                             class="more-link">查看详细</a>
+                                                    </div>
+                                                </div><!-- /.entry-content -->
+                                            </div><!-- /.entry-wrapper -->
+                                        </article><!-- /.blog-post -->
+                                    {% endfor %}
+                                {% else %}
+                                    <article class="blog-post">
+                                        <div class="entry-wrapper">
+                                            <h2>暂无公告</h2>
+                                        </div><!-- /.entry-wrapper -->
+                                    </article><!-- /.blog-post -->
+                                {% endif %}
+
+                            </div><!-- /.content-inner -->
+
+                        </div><!-- /.main-content-wrap -->
+                    </div><!-- /.main-content -->
+
+                    <div class="sidebars">
+                        <div class="sidebars-wrap">
+                            <div class="sidebar">
+                                <div class="widget widget_recent_entries">
+                                    <h4 class="widget-title">最近公告</h4>
+                                    <ul>
+                                        {% for p in recent_news %}
+                                            <li>
+                                                <a href="{{ p.get_url }}">{{ p.title }}</a>
+                                                <span class="entry-categories">{{ p.create_dt }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div><!-- /.widget_recent_entries -->
+
+                                <div class="widget widget_categories">
+                                    <h4 class="widget-title">分类</h4>
+                                    <ul>
+                                        {% for category in  categories %}
+                                            <li>
+                                                <a href="{% url 'blog-lists' %}?category={{ category.query }}">
+                                                    {{ category.name }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div><!-- /.widget_categories -->
+
+                                <div class="widget widget_text">
+                                    <div class="textwidget">
+                                        <div class="content-text">
+                                            <h4 class="title">我们如何帮助您?</h4>
+                                            <p>我们的客户服务标准提供了我们如何处理您的询问。
+                                                当你向我们提出反馈意见时，你会得到足够的信息以获得帮助。</p>
+                                            <a class="button white" href="tencent://message/?uin=3259818188">联系我们<i
+                                                    class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    </div><!-- /.textwidget -->
+                                </div><!-- /.widget_text -->
+                            </div><!-- /.sidebar -->
+                        </div><!-- /.sidebars-wrap -->
+                    </div><!-- /.sidebars -->
+                </div><!-- /.content-wrap  -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div><!-- /.blog -->
+{% endblock %}
+
+{% block footer %}{% include "controls/footer.html" %}{% endblock %}

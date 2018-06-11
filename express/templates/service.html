@@ -1,0 +1,878 @@
+{% extends "waybills/customer_base.html" %}
+
+{% block head_title %}
+    服务支持
+{% endblock %}
+
+{% block boxed %}
+    <div class="blog">
+        <div class="container">
+            <div class="row">
+                <div class="content-wrap">
+                    <div class="main-content">
+                        <div class="main-content-wrap">
+                            <div class="content-inner">
+
+
+                                <article class="blog-post" id="insurance">
+                                    <div class="entry-wrapper">
+                                        <div class="entry-content">
+                                            <div>
+                                                <h1>投保说明</h1>
+                                                <p>赔付价值：申报价值和购买价值中的较低值。<br/>
+                                                    清点服务：只为客户清点物品数量，品类，不包含质检。<br/>
+                                                    对未购买保险的包裹，我公司严格按照&lt;国际快递包裹丢失理赔条款&gt;要求的赔偿上限最高100美金理赔，建议客户购买保险。<br/>
+                                                    货物超过3个月未提供操作处理意见的将视为弃件。<br/>
+                                                    保险：</p>
+
+                                                <p>
+                                                    购买保险，保费为申报价值的1%，免赔额为10%，最高赔损额为9000元。免赔额10%的理解为：例如申报价值为1000元，如全丢失了，赔偿最高为900元，免赔100元。</p>
+
+                                                <p>少件：</p>
+
+                                                <p>1. 未选择清点的包裹，若是收到包裹后发现有少件情况，由于无法确定是哪个环节导致丢件，请客户先联系网站是否漏发，仓库不予理赔</p>
+
+                                                <p>2.
+                                                    选择清点的包裹，请在签收时查看内件数量，若是少件，请提供相关开箱破损证明，我们将按照赔付价值赔偿，如未购买保险，最高金额不超过1000RMB</p>
+
+                                                <p>丢包：</p>
+
+                                                <p>1. 已购买保险：若货物全部丢失，按货物赔付价值全赔+运费，最高不超过9000RMB</p>
+
+                                                <p>2. 未购买保险：未购买保险若货物全部丢失，按货物赔付价值全赔+运费，最高不超过1000元</p>
+
+                                                <p>破损：</p>
+
+                                                <p>1. 加固：根据包裹破损程度按赔付价值比例进行理赔，如未购买保险，最高金额不超过1000元</p>
+
+                                                <p>2. 未加固：根据包裹破损程度按赔付价值比例进行理赔，最高比例不超过赔付价值的30%，最高金额不超过1000元</p>
+
+                                                <p>3. 外包装破损：并未影响实际货物功能的(非物流包装)，仅外包装破损，内部无损，不予理赔</p>
+
+                                                <p>4. 外包装完好：外包装完好，内部破损，未加固的不予理赔，加固的则按加固赔偿</p>
+
+                                                <p>漏液：</p>
+
+                                                <p>1. 未加固商品漏液不予赔偿</p>
+
+                                                <p>2. 已加固的根据漏液比例进行赔偿，最高比例不超过赔付价值的20%</p>
+
+                                                <p>签收：</p>
+
+                                                <p>1. 签收前检查货物包装是否完好，是否有打开过的痕迹。</p>
+
+                                                <p>2. 发现破损等情况先别拒收，先让快递开破损证明，然后联系士奇客服，并按&ldquo;模板&rdquo;提供相关票据来申请理赔，因拒收而导致退运则不予理赔。</p>
+
+                                                <p>3. 到包裹被签收，您的包裹的海淘之旅也就结束了，我们也将不再对您的包裹进行负责，所以请在签收前仔细检查您的包裹。</p>
+                                            </div>
+                                        </div><!-- /.entry-content -->
+                                    </div><!-- /.entry-wrapper -->
+                                </article><!-- /.blog-post -->
+
+                                <article class="blog-post" hidden="hidden" id="disclaimer">
+                                    <div class="entry-wrapper">
+                                        <div class="entry-content">
+                                            <div>
+                                                <h1>免责条款</h1>
+
+                                                <p class="p1"><span class="s1">1. </span><span
+                                                        class="s2">易碎商品：无论是否有选择加固，破损或漏液不予赔偿，丢失理赔。（如玻璃制品）</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">2. </span><span class="s2">包裹内赠品、小样丢失或损坏不受理赔付</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">3. </span><span
+                                                        class="s2">天气自然灾害</span><span
+                                                        class="s1">,</span><span class="s2">暴乱</span><span
+                                                        class="s1">,</span><span class="s2">战争等不可抗因素造成的损失</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">4. </span><span
+                                                        class="s2">因清关时效、航班延误、快递延误、等导致的商品性质变化过保质期、过保修期等不可抗因素</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">5. </span><span
+                                                        class="s2">被海关没收</span><span class="s1">(</span><span
+                                                        class="s2">如未能通过海关商检</span><span class="s1">)</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">6.</span><span
+                                                        class="s2">禁运物品转寄或退货造成的丢件</span><span
+                                                        class="s1">,</span><span class="s2">破损</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">7.</span><span class="s2">未预报商品</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">8.</span><span
+                                                        class="s2">商家发货漏发</span><span class="s1">,</span><span
+                                                        class="s2">少发</span><span class="s1">,</span><span
+                                                        class="s2">错发</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">9.</span><span class="s2">禁运物品退货或转寄至其他转运公司导致的丢失</span><span
+                                                        class="s1">,</span><span class="s2">破损</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">10.</span><span class="s2">超出索赔受理时效的（自签收日期起</span><span
+                                                        class="s1">7</span><span class="s2">日内）</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">11.</span><span class="s2">无理赔附件材料或理赔材料不齐全的理赔申请将被退回</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">12.</span><span class="s2">预报但未入士奇海外仓库的不参与以上索赔条款</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">13.</span><span
+                                                        class="s2">气温变化导致产品性质变化</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s2">不承保范围</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">1.</span><span class="s2">现金、支票、票据、单证、有价证券、信用证、护照以及艺术品、金银、珠宝、首饰、钻石、玉器、文物古玩；</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">2.</span><span
+                                                        class="s2">鱼粉、菜籽饼、地瓜干、花生、各类粮食饲料、原糖等有自燃特性、易腐易蛀物品；</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">3.</span><span class="s2">中国大陆境内无修复或定损技术能力和相关配件的精密货品；</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">4.</span><span class="s2">危险品、易燃易爆物品、卫星、武器弹药、军用品；</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">5.</span><span class="s2">动植物、海货、鲜活货、需冷藏运输的货物；</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">6.</span><span
+                                                        class="s2">舱面货（集装箱运输方式除外）；</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">7.</span><span
+                                                        class="s2">裸装或散装运输货品；</span></p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s1">8.</span><span class="s2">返修、在用货物、旧货、二手货品。</span>
+                                                </p>
+
+                                            </div>
+                                        </div><!-- /.entry-content -->
+                                    </div><!-- /.entry-wrapper -->
+                                </article><!-- /.blog-post -->
+
+                                <article class="blog-post" hidden="hidden" id="terms">
+                                    <div class="entry-wrapper">
+                                        <div class="entry-content">
+                                            <div>
+                                                <h1>网站服务条款</h1>
+                                                <p class="p1"><span class="s1">&ldquo;</span><span
+                                                        class="s2">士奇快递</span><span
+                                                        class="s1">&rdquo;</span><span class="s2">在该域名下的网页内容未经我公司授权允许，擅自使用</span><span
+                                                        class="s1"> &ldquo;</span><span
+                                                        class="s2">士奇快递</span><span class="s1">&rdquo;</span><span
+                                                        class="s2">注册商标，属于恶意侵权行为。</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s2">网站内容准确性</span></p>
+
+                                                <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span
+                                                        class="s2">本公司网页可能包括由于疏忽大意的不准确现象或排版错误。一旦发现错误，士奇速度将进行纠正。网页上的内容将定期进行更新，但是在未更新前可能出现不准确。全球独立运行的国际互联网站有成千上万之多，因此通过本网站而访问的某些信息可能来自于士奇快递之外。因此，士奇对这些内容不承担任何义务或责任。</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s2">免责声明</span></p>
+
+                                                <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span
+                                                        class="s2">本网站中的服务、内容和信息仅已现状的基础提供。在法律允许的最大范围内士奇不提供任何说明和保证。士奇快递许可方不保证本站点或系统提供的服务、内容和信息的准确性、完整性、安全性或及时性。通过士奇系统或站点获取的信息不应构成任何在士奇使用条款中没有明示的保证</span><span
+                                                        class="s1">,</span><span class="s2">因此部分上述的条款可能不适用于您的情况。如果您是作为消费者面对免责条款，则这些规定不会影响您的合法使用权利，如果出现冲突，则您的合法权益不会被免除。您同意并声明这些使用条款的责任和保证是公平并且合理的。</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s2">责任限制</span></p>
+
+                                                <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span
+                                                        class="s2">在法律内的最大范围内</span><span class="s1">,</span><span
+                                                        class="s2">任何侵权行为或其它任何法律理论，也无论我公司是否被告知有此类损害的可能性，士奇系统</span><span
+                                                        class="s1">,</span><span class="s2">包含在站点中的服务、内容或信息的使用、无法使用而造成的任何损害，包括利润损失、数据丢失或业务中断等损害。在适用法律的最大范围内，并不对上述内容构成限制，您同意在任何情况下，无论是根据合同、侵权行为或其他行为，也无论起诉或索赔，士奇对任何损坏（直接或非直接）或者丢失承担的全部责任不超过</span><span
+                                                        class="s1">100</span><span class="s2">美元。在法律允许的最大范围内，在这些使用条款中为您陈述的补救条款将被排除使用条款中的内容。</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s2">产品与服务</span></p>
+
+                                                <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span
+                                                        class="s2">在网页中提到的运输产品和服务均受限于士奇标准运输条款。因为产品与服务根据发货营业地点的不同而并不相同，所以请与士奇客户服务中心联系，以获得更新的信息，并非所有士奇产品与服务在全部营业地点都提供。</span>
+                                                </p>
+
+                                                <p class="p2">&nbsp;</p>
+
+                                                <p class="p1"><span class="s2">信息披露</span></p>
+
+                                                <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span
+                                                        class="s2">由访问者向士奇网页提供的所有信息都将被视为保密信息，除非由于提供服务所需，士奇将不会将这些信息向任何第三方披露。</span>
+                                                </p>
+
+                                            </div>
+                                        </div><!-- /.entry-content -->
+                                    </div><!-- /.entry-wrapper -->
+                                </article><!-- /.blog-post -->
+
+                                <article class="blog-post" hidden="hidden" id="forbidden">
+                                    <div class="entry-wrapper">
+                                        <div class="entry-content">
+                                            <div>
+                                                <h1>违禁品说明</h1>
+
+                                                <p class="p1"><span class="s1">一</span><span class="s2">,</span><span
+                                                        class="s1">全程经陆运运输的国内件禁止收寄物品</span></p>
+
+                                                <p class="p1"><span class="s2">1,</span><span
+                                                        class="s1">贵重物品</span><span class="s2">:</span><span
+                                                        class="s1">金装</span><span class="s2"> </span><span
+                                                        class="s1">银条</span><span
+                                                        class="s2"> </span><span class="s1">现金</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">铂金</span><span class="s2"> </span><span
+                                                        class="s1">等</span></p>
+
+                                                <p class="p1"><span class="s2">2,</span><span
+                                                        class="s1">可议付的物品</span><span class="s2">:</span><span
+                                                        class="s1">信用卡</span><span class="s2"> </span><span class="s1">电话卡</span><span
+                                                        class="s2"> </span><span class="s1">车票</span><span
+                                                        class="s2"><span>&nbsp; </span></span><span class="s1">支票</span><span
+                                                        class="s2"> </span><span class="s1">非现金票证</span><span
+                                                        class="s2"> </span><span class="s1">空白的陆行票证等</span>
+                                                </p>
+
+                                                <p class="p1"><span class="s2">3,</span><span
+                                                        class="s1">古董和工艺品</span><span class="s2">:</span><span
+                                                        class="s1">如明代的瓷器</span><span class="s2"> </span><span
+                                                        class="s1">精致的玻璃制品等</span></p>
+
+                                                <p class="p1"><span class="s2">4,</span><span
+                                                        class="s1">医疗样品</span><span class="s2">:</span><span
+                                                        class="s1">诊断样品</span><span
+                                                        class="s2"><span>&nbsp; </span></span><span class="s1">血样</span><span
+                                                        class="s2"> </span><span class="s1">尿样</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">人体组织等</span></p>
+
+                                                <p class="p1"><span class="s2">5,</span><span
+                                                        class="s1">易燃易爆</span><span class="s2"> </span><span
+                                                        class="s1">腐蚀性</span><span class="s2"> </span><span class="s1">毒性</span><span
+                                                        class="s2"> </span><span class="s1">强酸碱性和放射性的各种危险品</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">如</span><span class="s2">:</span><span
+                                                        class="s1">火柴</span><span
+                                                        class="s2"> </span><span class="s1">雷管</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">火药</span><span class="s2"> </span><span
+                                                        class="s1">宝珠</span><span
+                                                        class="s2"> </span><span class="s1">汽油</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">柴油</span><span class="s2"> </span><span
+                                                        class="s1">没有</span><span
+                                                        class="s2"> </span><span class="s1">酒精</span><span
+                                                        class="s2">(</span><span
+                                                        class="s1">液体和固体</span><span class="s2">) </span><span
+                                                        class="s1">硫酸</span><span
+                                                        class="s2"> </span><span class="s1">盐酸</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">硝酸</span><span class="s2"> </span><span class="s1">有机溶液</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">农药以及其他列入化学工业出版社出版的</span><span
+                                                        class="s2">&lt;</span><span class="s1">化学危险品使用手册</span><span
+                                                        class="s2">&gt;</span><span
+                                                        class="s1">中的化工用品</span></p>
+
+                                                <p class="p1"><span class="s2">6,</span><span
+                                                        class="s1">各类烈性毒药</span><span class="s2">,</span><span
+                                                        class="s1">麻醉药物和精神物品</span><span class="s2">,</span><span
+                                                        class="s1">如</span><span
+                                                        class="s2">:</span><span class="s1">砒霜</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">鸦片</span><span class="s2"> </span><span
+                                                        class="s1">吗啡</span><span
+                                                        class="s2"> </span><span class="s1">可卡因</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">海洛因</span><span
+                                                        class="s2"><span>&nbsp; </span></span><span
+                                                        class="s1">大麻等</span>
+                                                </p>
+
+                                                <p class="p1"><span class="s2">7,</span><span
+                                                        class="s1">国家明令禁止流通或寄运的物品</span><span
+                                                        class="s2">,</span><span class="s1">如</span><span
+                                                        class="s2">:</span><span
+                                                        class="s1">文物</span><span class="s2"> </span><span
+                                                        class="s1">武器</span><span
+                                                        class="s2"> </span><span class="s1">弹药</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">仿真武器等</span></p>
+
+                                                <p class="p1"><span class="s2">8,</span><span class="s1">我公司无法承诺货物一定送到收货人本人手上</span><span
+                                                        class="s2">,</span><span class="s1">但承担由此可能带来的遗失风险</span></p>
+
+                                                <p class="p1"><span class="s2">9,</span><span class="s1">妨碍公共安全和容易造成公共秩序混乱的物品</span><span
+                                                        class="s2">,</span><span class="s1">如</span><span
+                                                        class="s2">:</span><span
+                                                        class="s1">尸骨</span><span class="s2">(</span><span class="s1">包裹已焚的尸骨</span><span
+                                                        class="s2">),</span><span class="s1">未经硝制的兽皮</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">未经药治的兽骨</span></p>
+
+                                                <p class="p1"><span class="s2">10,</span><span class="s1">动物</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">植物以及它们的标本</span></p>
+
+                                                <p class="p1"><span class="s2">11,</span><span
+                                                        class="s1">难以辨认的白色粉末</span></p>
+
+                                                <p class="p1"><span class="s2">12,</span><span
+                                                        class="s1">液体类</span><span class="s2">:</span><span
+                                                        class="s1">海鲜</span><span class="s2"> </span><span class="s1">含酒精的液体</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">水剂等</span></p>
+
+                                                <p class="p1"><span class="s2">13,</span><span
+                                                        class="s1">易碎品</span><span class="s2">:</span><span
+                                                        class="s1">玻璃制品</span></p>
+
+                                                <p class="p1"><span class="s1">二</span><span class="s2">,</span><span
+                                                        class="s1">航空禁止收寄物品</span><span class="s2">(</span><span
+                                                        class="s1">包括</span><span
+                                                        class="s2">&rdquo;</span><span class="s1">全国经陆路运输的国内件收寄物品</span><span
+                                                        class="s2">&rdquo;</span><span class="s1">的所有内容</span><span
+                                                        class="s2">)</span></p>
+
+                                                <p class="p1"><span class="s2">1,</span><span class="s1">威胁航空飞行安全的物品是指在航空运输中</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">可能明显的危害人身健康</span><span class="s2">,</span><span
+                                                        class="s1">安全或对财产造成苏海的物品或物质</span><span class="s2"> </span><span
+                                                        class="s1">主要有一下几类</span><span class="s2">:</span></p>
+
+                                                <p class="p1"><span class="s2">A,</span><span class="s1">爆炸品</span><span
+                                                        class="s2">:</span><span
+                                                        class="s1">如烟花爆竹</span><span class="s2">,</span><span
+                                                        class="s1">起爆引信等</span></p>
+
+                                                <p class="p1"><span class="s2">B,</span><span class="s1">气体</span><span
+                                                        class="s2">:</span><span
+                                                        class="s1">如压缩气体</span><span class="s2">,</span><span
+                                                        class="s1">干冰</span><span
+                                                        class="s2">,</span><span class="s1">灭火器</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">充气筒</span><span class="s2">(</span><span class="s1">无排放装置</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">不能再充气的</span><span class="s2">),</span><span
+                                                        class="s1">救生器</span><span
+                                                        class="s2">(</span><span class="s1">可自动膨胀</span><span
+                                                        class="s2">)</span><span
+                                                        class="s1">等</span></p>
+
+                                                <p class="p1"><span class="s2">C,</span><span
+                                                        class="s1">易燃液体</span><span class="s2">:</span><span
+                                                        class="s1">如油漆</span><span class="s2">,</span><span class="s1">汽油</span><span
+                                                        class="s2">,</span><span class="s1">酒精</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">机油</span><span class="s2">,</span><span class="s1">樟脑油</span><span
+                                                        class="s2">,</span><span class="s1">发动机启动液</span><span
+                                                        class="s2">,</span><span class="s1">松节油</span><span
+                                                        class="s2">,</span><span class="s1">天拿水</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">胶水</span><span class="s2">,</span><span class="s1">香水等</span>
+                                                </p>
+
+                                                <p class="p1"><span class="s2">D,</span><span
+                                                        class="s1">易燃固体</span><span class="s2">:</span><span
+                                                        class="s1">自然物质</span><span class="s2">,</span><span class="s1">遇水释放易燃气体的物质</span><span
+                                                        class="s2">,</span><span class="s1">如活性炭</span><span
+                                                        class="s2"> </span><span
+                                                        class="s1">钛粉</span><span class="s2"> </span><span class="s1">椰肉干</span><span
+                                                        class="s2"> </span><span class="s1">蓖麻制品</span><span
+                                                        class="s2"> </span><span class="s1">橡胶碎片</span><span
+                                                        class="s2"> </span><span class="s1">安全火柴</span><span class="s2">(</span><span
+                                                        class="s1">盒擦的或片擦的</span><span
+                                                        class="s2">) </span><span class="s1">干燥白磷</span><span
+                                                        class="s2"> </span><span class="s1">干燥黄磷</span><span
+                                                        class="s2"> </span><span class="s1">镁粉等</span></p>
+
+                                                <p class="p1"><span class="s2">E,</span><span
+                                                        class="s1">氧化剂和有机过氧化物</span><span
+                                                        class="s2">:</span><span class="s1">如高锰酸钾</span></p>
+
+                                                <p class="p1"><span class="s1">三</span><span class="s2">:</span><span
+                                                        class="s1">明确禁止邮寄物品</span></p>
+
+                                                <p class="p1"><span
+                                                        class="s1">各种武器，仿真武器：子弹、枪支、地雷、弓箭、瞄准器、枪械配件等；各种烈性毒药</span><span
+                                                        class="s2">, </span><span class="s1">鸦片、吗啡、海洛英以及其它能使人成瘾的麻醉品、精神药物等；易燃、易爆品：打火机、打火机油、油漆、涂料、香水、指甲油、美甲凝胶、稀释剂、光漆、火柴、炭、雷管、锂电池、油、硫磺、烟花、炸药等；含有酒精的液体，碳酸饮料（瓶装）；酒类（酒精含量不超过</span><span
+                                                        class="s2">20</span><span class="s1">度）标有【火气严禁】的商品；高压喷雾类型的增发剂、止汗剂、瓶装液化气、摩斯、脱毛喷雾等；高压喷雾罐、打火机补充瓦斯、潜水用氧气瓶、露营用瓦斯炉罐装瓦斯、灭火器、高压除尘空气罐、携带式氧气罐、氦气瓶、氯氟烃、瓦斯暖炉汽车悬吊系统；染发剂、精油、香薰、香水、指甲油、洗甲水、发胶、</span><span
+                                                        class="s2"> </span><span class="s1">漂白剂、胶水、发蜡、双眼皮胶及其它含胶水及酒精成分的化妆品。冷冻品、冷藏品、生鲜食品；容易腐烂的物品（鲜鱼、鲜肉、鲜蛋、鲜蔬菜）；带有危险性病菌</span><span
+                                                        class="s2">,</span><span class="s1">虫害及其它有害生物的动物</span><span
+                                                        class="s2">,</span><span
+                                                        class="s1">植物及其产品；贵重金属、宝石、磁性物质、水银、消臭剂、酸化物、气体、草席、气化性物品、冰。对中国政治、经济、文化、道德有害的印刷品、胶卷、照片、唱片、影片、录音带、录像带、激光视盘、计算机存储介质及其他物品；其他物品：磁铁、引擎、干冰、石绵、毒品、麻药、精神药品、猥亵的物品、彩券、空气枪、模造刀</span><span
+                                                        class="s2">(</span><span class="s1">美术刀</span><span
+                                                        class="s2">)</span><span
+                                                        class="s1">、家畜饲料、植物、生鲜食品、活体动物</span><span
+                                                        class="s2">(</span><span class="s1">华盛顿条约</span><span
+                                                        class="s2">)</span><span class="s1">、含有血液的制剂品、宝石、钻石</span><span
+                                                        class="s2">(</span><span class="s1">包含加工品</span><span
+                                                        class="s2">)</span><span class="s1">、伪造货币、邮票或印花、个人文件、有价证券、国宝、重要文化遗产、重要美术品、拷贝光碟、盗版光碟、产地不明物品、信用卡、商品券、票券</span><span
+                                                        class="s2">(</span><span class="s1">演唱会门票等等</span><span
+                                                        class="s2">)</span><span class="s1">、机票等。</span>
+                                                </p>
+
+
+                                            </div>
+                                        </div><!-- /.entry-content -->
+                                    </div><!-- /.entry-wrapper -->
+                                </article><!-- /.blog-post -->
+
+
+                            </div><!-- /.content-inner -->
+
+                        </div><!-- /.main-content-wrap -->
+                    </div><!-- /.main-content -->
+
+                    <div class="sidebars">
+                        <div class="sidebars-wrap">
+                            <div class="sidebar">
+                                <div class="widget widget_categories">
+                                    <h4 class="widget-title">服务支持</h4>
+                                    <ul>
+                                        <li>
+                                            <a onclick="showPost('insurance')">投保说明</a><br>
+                                            <a onclick="showPost('disclaimer')">免责条款</a><br>
+                                            <a onclick="showPost('terms')">网站服务条款</a><br>
+                                            <a onclick="showPost('forbidden')">违禁品说明</a>
+                                        </li>
+                                    </ul>
+                                </div><!-- /.widget_categories -->
+
+                                <div class="widget widget_text">
+                                    <div class="textwidget">
+                                        <div class="content-text">
+                                            <h4 class="title">我们如何帮助您?</h4>
+                                            <p>我们的客户服务标准提供了我们如何处理您的询问。
+                                                当你向我们提出反馈意见时，你会得到足够的信息以获得帮助。</p>
+                                            <a class="button white" href="tencent://message/?uin=3259818188">联系我们<i
+                                                    class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    </div><!-- /.textwidget -->
+                                </div><!-- /.widget_text -->
+                            </div><!-- /.sidebar -->
+                        </div><!-- /.sidebars-wrap -->
+                    </div><!-- /.sidebars -->
+                </div><!-- /.content-wrap  -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div><!-- /.blog -->
+{% endblock %}
+
+{##}
+{#{% block content %}#}
+{#    <div class="row">#}
+{#        <div class="col-sm-3">#}
+{#            <h2>服务支持</h2>#}
+{#            <ul class="nav nav-tabs nav-stacked">#}
+{#                <li class="active"><a href="#insurance" data-toggle="tab" aria-expanded="true"><h5>投保说明</h5></a></li>#}
+{#                <li><a href="#disclaimer" data-toggle="tab" aria-expanded="true"><h5>免责条款</h5></a></li>#}
+{#                <li><a href="#terms" data-toggle="tab" aria-expanded="true"><h5>网站服务条款</h5></a></li>#}
+{#                <li><a href="#forbidden" data-toggle="tab" aria-expanded="true"><h5>违禁品说明</h5></a></li>#}
+{#            </ul>#}
+{#        </div>#}
+{#        <div class="col-sm-9">#}
+{#            <div id="myTabContent" class="tab-content">#}
+{#                <div class="tab-pane fade active in" id="insurance">#}
+{#                    <h1>投保说明</h1>#}
+{#                    <p>赔付价值：申报价值和购买价值中的较低值。<br/>#}
+{#                        清点服务：只为客户清点物品数量，品类，不包含质检。<br/>#}
+{#                        对未购买保险的包裹，我公司严格按照&lt;国际快递包裹丢失理赔条款&gt;要求的赔偿上限最高100美金理赔，建议客户购买保险。<br/>#}
+{#                        货物超过3个月未提供操作处理意见的将视为弃件。<br/>#}
+{#                        保险：</p>#}
+{##}
+{#                    <p>购买保险，保费为申报价值的1%，免赔额为10%，最高赔损额为9000元。免赔额10%的理解为：例如申报价值为1000元，如全丢失了，赔偿最高为900元，免赔100元。</p>#}
+{##}
+{#                    <p>少件：</p>#}
+{##}
+{#                    <p>1. 未选择清点的包裹，若是收到包裹后发现有少件情况，由于无法确定是哪个环节导致丢件，请客户先联系网站是否漏发，仓库不予理赔</p>#}
+{##}
+{#                    <p>2. 选择清点的包裹，请在签收时查看内件数量，若是少件，请提供相关开箱破损证明，我们将按照赔付价值赔偿，如未购买保险，最高金额不超过1000RMB</p>#}
+{##}
+{#                    <p>丢包：</p>#}
+{##}
+{#                    <p>1. 已购买保险：若货物全部丢失，按货物赔付价值全赔+运费，最高不超过9000RMB</p>#}
+{##}
+{#                    <p>2. 未购买保险：未购买保险若货物全部丢失，按货物赔付价值全赔+运费，最高不超过1000元</p>#}
+{##}
+{#                    <p>破损：</p>#}
+{##}
+{#                    <p>1. 加固：根据包裹破损程度按赔付价值比例进行理赔，如未购买保险，最高金额不超过1000元</p>#}
+{##}
+{#                    <p>2. 未加固：根据包裹破损程度按赔付价值比例进行理赔，最高比例不超过赔付价值的30%，最高金额不超过1000元</p>#}
+{##}
+{#                    <p>3. 外包装破损：并未影响实际货物功能的(非物流包装)，仅外包装破损，内部无损，不予理赔</p>#}
+{##}
+{#                    <p>4. 外包装完好：外包装完好，内部破损，未加固的不予理赔，加固的则按加固赔偿</p>#}
+{##}
+{#                    <p>漏液：</p>#}
+{##}
+{#                    <p>1. 未加固商品漏液不予赔偿</p>#}
+{##}
+{#                    <p>2. 已加固的根据漏液比例进行赔偿，最高比例不超过赔付价值的20%</p>#}
+{##}
+{#                    <p>签收：</p>#}
+{##}
+{#                    <p>1. 签收前检查货物包装是否完好，是否有打开过的痕迹。</p>#}
+{##}
+{#                    <p>2. 发现破损等情况先别拒收，先让快递开破损证明，然后联系士奇客服，并按&ldquo;模板&rdquo;提供相关票据来申请理赔，因拒收而导致退运则不予理赔。</p>#}
+{##}
+{#                    <p>3. 到包裹被签收，您的包裹的海淘之旅也就结束了，我们也将不再对您的包裹进行负责，所以请在签收前仔细检查您的包裹。</p>#}
+{##}
+{#                </div>#}
+{#                <div class="tab-pane fade" id="disclaimer">#}
+{#                    <h1>免责条款</h1>#}
+{##}
+{#                    <p class="p1"><span class="s1">1. </span><span#}
+{#                            class="s2">易碎商品：无论是否有选择加固，破损或漏液不予赔偿，丢失理赔。（如玻璃制品）</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">2. </span><span class="s2">包裹内赠品、小样丢失或损坏不受理赔付</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">3. </span><span class="s2">天气自然灾害</span><span#}
+{#                            class="s1">,</span><span class="s2">暴乱</span><span class="s1">,</span><span class="s2">战争等不可抗因素造成的损失</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">4. </span><span#}
+{#                            class="s2">因清关时效、航班延误、快递延误、等导致的商品性质变化过保质期、过保修期等不可抗因素</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">5. </span><span class="s2">被海关没收</span><span class="s1">(</span><span#}
+{#                            class="s2">如未能通过海关商检</span><span class="s1">)</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">6.</span><span class="s2">禁运物品转寄或退货造成的丢件</span><span#}
+{#                            class="s1">,</span><span class="s2">破损</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">7.</span><span class="s2">未预报商品</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">8.</span><span class="s2">商家发货漏发</span><span class="s1">,</span><span#}
+{#                            class="s2">少发</span><span class="s1">,</span><span class="s2">错发</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">9.</span><span class="s2">禁运物品退货或转寄至其他转运公司导致的丢失</span><span#}
+{#                            class="s1">,</span><span class="s2">破损</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">10.</span><span class="s2">超出索赔受理时效的（自签收日期起</span><span#}
+{#                            class="s1">7</span><span class="s2">日内）</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">11.</span><span class="s2">无理赔附件材料或理赔材料不齐全的理赔申请将被退回</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">12.</span><span class="s2">预报但未入士奇海外仓库的不参与以上索赔条款</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">13.</span><span class="s2">气温变化导致产品性质变化</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s2">不承保范围</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">1.</span><span class="s2">现金、支票、票据、单证、有价证券、信用证、护照以及艺术品、金银、珠宝、首饰、钻石、玉器、文物古玩；</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">2.</span><span#}
+{#                            class="s2">鱼粉、菜籽饼、地瓜干、花生、各类粮食饲料、原糖等有自燃特性、易腐易蛀物品；</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">3.</span><span class="s2">中国大陆境内无修复或定损技术能力和相关配件的精密货品；</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">4.</span><span class="s2">危险品、易燃易爆物品、卫星、武器弹药、军用品；</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">5.</span><span class="s2">动植物、海货、鲜活货、需冷藏运输的货物；</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">6.</span><span class="s2">舱面货（集装箱运输方式除外）；</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">7.</span><span class="s2">裸装或散装运输货品；</span></p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s1">8.</span><span class="s2">返修、在用货物、旧货、二手货品。</span></p>#}
+{##}
+{#                </div>#}
+{#                <div class="tab-pane fade" id="terms">#}
+{#                    <h1>网站服务条款</h1>#}
+{#                    <p class="p1"><span class="s1">&ldquo;</span><span class="s2">士奇快递</span><span#}
+{#                            class="s1">&rdquo;</span><span class="s2">在该域名下的网页内容未经我公司授权允许，擅自使用</span><span class="s1"> &ldquo;</span><span#}
+{#                            class="s2">士奇快递</span><span class="s1">&rdquo;</span><span class="s2">注册商标，属于恶意侵权行为。</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s2">网站内容准确性</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span class="s2">本公司网页可能包括由于疏忽大意的不准确现象或排版错误。一旦发现错误，士奇速度将进行纠正。网页上的内容将定期进行更新，但是在未更新前可能出现不准确。全球独立运行的国际互联网站有成千上万之多，因此通过本网站而访问的某些信息可能来自于士奇快递之外。因此，士奇对这些内容不承担任何义务或责任。</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s2">免责声明</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span class="s2">本网站中的服务、内容和信息仅已现状的基础提供。在法律允许的最大范围内士奇不提供任何说明和保证。士奇快递许可方不保证本站点或系统提供的服务、内容和信息的准确性、完整性、安全性或及时性。通过士奇系统或站点获取的信息不应构成任何在士奇使用条款中没有明示的保证</span><span#}
+{#                            class="s1">,</span><span class="s2">因此部分上述的条款可能不适用于您的情况。如果您是作为消费者面对免责条款，则这些规定不会影响您的合法使用权利，如果出现冲突，则您的合法权益不会被免除。您同意并声明这些使用条款的责任和保证是公平并且合理的。</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s2">责任限制</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span#}
+{#                            class="s2">在法律内的最大范围内</span><span class="s1">,</span><span class="s2">任何侵权行为或其它任何法律理论，也无论我公司是否被告知有此类损害的可能性，士奇系统</span><span#}
+{#                            class="s1">,</span><span class="s2">包含在站点中的服务、内容或信息的使用、无法使用而造成的任何损害，包括利润损失、数据丢失或业务中断等损害。在适用法律的最大范围内，并不对上述内容构成限制，您同意在任何情况下，无论是根据合同、侵权行为或其他行为，也无论起诉或索赔，士奇对任何损坏（直接或非直接）或者丢失承担的全部责任不超过</span><span#}
+{#                            class="s1">100</span><span class="s2">美元。在法律允许的最大范围内，在这些使用条款中为您陈述的补救条款将被排除使用条款中的内容。</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s2">产品与服务</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span class="s2">在网页中提到的运输产品和服务均受限于士奇标准运输条款。因为产品与服务根据发货营业地点的不同而并不相同，所以请与士奇客户服务中心联系，以获得更新的信息，并非所有士奇产品与服务在全部营业地点都提供。</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p2">&nbsp;</p>#}
+{##}
+{#                    <p class="p1"><span class="s2">信息披露</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1"><span>&nbsp; &nbsp; </span></span><span class="s2">由访问者向士奇网页提供的所有信息都将被视为保密信息，除非由于提供服务所需，士奇将不会将这些信息向任何第三方披露。</span>#}
+{#                    </p>#}
+{##}
+{#                </div>#}
+{#                <div class="tab-pane fade" id="forbidden">#}
+{#                    <h1>违禁品说明</h1>#}
+{##}
+{#                    <p class="p1"><span class="s1">一</span><span class="s2">,</span><span#}
+{#                            class="s1">全程经陆运运输的国内件禁止收寄物品</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">1,</span><span class="s1">贵重物品</span><span class="s2">:</span><span#}
+{#                            class="s1">金装</span><span class="s2"> </span><span class="s1">银条</span><span#}
+{#                            class="s2"> </span><span class="s1">现金</span><span class="s2"> </span><span#}
+{#                            class="s1">铂金</span><span class="s2"> </span><span class="s1">等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">2,</span><span class="s1">可议付的物品</span><span class="s2">:</span><span#}
+{#                            class="s1">信用卡</span><span class="s2"> </span><span class="s1">电话卡</span><span#}
+{#                            class="s2"> </span><span class="s1">车票</span><span#}
+{#                            class="s2"><span>&nbsp; </span></span><span class="s1">支票</span><span#}
+{#                            class="s2"> </span><span class="s1">非现金票证</span><span class="s2"> </span><span class="s1">空白的陆行票证等</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p1"><span class="s2">3,</span><span class="s1">古董和工艺品</span><span class="s2">:</span><span#}
+{#                            class="s1">如明代的瓷器</span><span class="s2"> </span><span class="s1">精致的玻璃制品等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">4,</span><span class="s1">医疗样品</span><span class="s2">:</span><span#}
+{#                            class="s1">诊断样品</span><span class="s2"><span>&nbsp; </span></span><span class="s1">血样</span><span#}
+{#                            class="s2"> </span><span class="s1">尿样</span><span class="s2"> </span><span#}
+{#                            class="s1">人体组织等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">5,</span><span class="s1">易燃易爆</span><span class="s2"> </span><span#}
+{#                            class="s1">腐蚀性</span><span class="s2"> </span><span class="s1">毒性</span><span#}
+{#                            class="s2"> </span><span class="s1">强酸碱性和放射性的各种危险品</span><span class="s2"> </span><span#}
+{#                            class="s1">如</span><span class="s2">:</span><span class="s1">火柴</span><span#}
+{#                            class="s2"> </span><span class="s1">雷管</span><span class="s2"> </span><span#}
+{#                            class="s1">火药</span><span class="s2"> </span><span class="s1">宝珠</span><span#}
+{#                            class="s2"> </span><span class="s1">汽油</span><span class="s2"> </span><span#}
+{#                            class="s1">柴油</span><span class="s2"> </span><span class="s1">没有</span><span#}
+{#                            class="s2"> </span><span class="s1">酒精</span><span class="s2">(</span><span#}
+{#                            class="s1">液体和固体</span><span class="s2">) </span><span class="s1">硫酸</span><span#}
+{#                            class="s2"> </span><span class="s1">盐酸</span><span class="s2"> </span><span#}
+{#                            class="s1">硝酸</span><span class="s2"> </span><span class="s1">有机溶液</span><span#}
+{#                            class="s2"> </span><span class="s1">农药以及其他列入化学工业出版社出版的</span><span#}
+{#                            class="s2">&lt;</span><span class="s1">化学危险品使用手册</span><span class="s2">&gt;</span><span#}
+{#                            class="s1">中的化工用品</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">6,</span><span class="s1">各类烈性毒药</span><span class="s2">,</span><span#}
+{#                            class="s1">麻醉药物和精神物品</span><span class="s2">,</span><span class="s1">如</span><span#}
+{#                            class="s2">:</span><span class="s1">砒霜</span><span class="s2"> </span><span#}
+{#                            class="s1">鸦片</span><span class="s2"> </span><span class="s1">吗啡</span><span#}
+{#                            class="s2"> </span><span class="s1">可卡因</span><span class="s2"> </span><span#}
+{#                            class="s1">海洛因</span><span class="s2"><span>&nbsp; </span></span><span class="s1">大麻等</span>#}
+{#                    </p>#}
+{##}
+{#                    <p class="p1"><span class="s2">7,</span><span class="s1">国家明令禁止流通或寄运的物品</span><span#}
+{#                            class="s2">,</span><span class="s1">如</span><span class="s2">:</span><span#}
+{#                            class="s1">文物</span><span class="s2"> </span><span class="s1">武器</span><span#}
+{#                            class="s2"> </span><span class="s1">弹药</span><span class="s2"> </span><span#}
+{#                            class="s1">仿真武器等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">8,</span><span class="s1">我公司无法承诺货物一定送到收货人本人手上</span><span#}
+{#                            class="s2">,</span><span class="s1">但承担由此可能带来的遗失风险</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">9,</span><span class="s1">妨碍公共安全和容易造成公共秩序混乱的物品</span><span#}
+{#                            class="s2">,</span><span class="s1">如</span><span class="s2">:</span><span#}
+{#                            class="s1">尸骨</span><span class="s2">(</span><span class="s1">包裹已焚的尸骨</span><span#}
+{#                            class="s2">),</span><span class="s1">未经硝制的兽皮</span><span class="s2">,</span><span#}
+{#                            class="s1">未经药治的兽骨</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">10,</span><span class="s1">动物</span><span class="s2">,</span><span#}
+{#                            class="s1">植物以及它们的标本</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">11,</span><span class="s1">难以辨认的白色粉末</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">12,</span><span class="s1">液体类</span><span class="s2">:</span><span#}
+{#                            class="s1">海鲜</span><span class="s2"> </span><span class="s1">含酒精的液体</span><span class="s2">,</span><span#}
+{#                            class="s1">水剂等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">13,</span><span class="s1">易碎品</span><span class="s2">:</span><span#}
+{#                            class="s1">玻璃制品</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1">二</span><span class="s2">,</span><span#}
+{#                            class="s1">航空禁止收寄物品</span><span class="s2">(</span><span class="s1">包括</span><span#}
+{#                            class="s2">&rdquo;</span><span class="s1">全国经陆路运输的国内件收寄物品</span><span#}
+{#                            class="s2">&rdquo;</span><span class="s1">的所有内容</span><span class="s2">)</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">1,</span><span class="s1">威胁航空飞行安全的物品是指在航空运输中</span><span class="s2">,</span><span#}
+{#                            class="s1">可能明显的危害人身健康</span><span class="s2">,</span><span#}
+{#                            class="s1">安全或对财产造成苏海的物品或物质</span><span class="s2"> </span><span#}
+{#                            class="s1">主要有一下几类</span><span class="s2">:</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">A,</span><span class="s1">爆炸品</span><span class="s2">:</span><span#}
+{#                            class="s1">如烟花爆竹</span><span class="s2">,</span><span class="s1">起爆引信等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">B,</span><span class="s1">气体</span><span class="s2">:</span><span#}
+{#                            class="s1">如压缩气体</span><span class="s2">,</span><span class="s1">干冰</span><span#}
+{#                            class="s2">,</span><span class="s1">灭火器</span><span class="s2">,</span><span#}
+{#                            class="s1">充气筒</span><span class="s2">(</span><span class="s1">无排放装置</span><span class="s2">,</span><span#}
+{#                            class="s1">不能再充气的</span><span class="s2">),</span><span class="s1">救生器</span><span#}
+{#                            class="s2">(</span><span class="s1">可自动膨胀</span><span class="s2">)</span><span#}
+{#                            class="s1">等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">C,</span><span class="s1">易燃液体</span><span class="s2">:</span><span#}
+{#                            class="s1">如油漆</span><span class="s2">,</span><span class="s1">汽油</span><span#}
+{#                            class="s2">,</span><span class="s1">酒精</span><span class="s2">,</span><span#}
+{#                            class="s1">机油</span><span class="s2">,</span><span class="s1">樟脑油</span><span#}
+{#                            class="s2">,</span><span class="s1">发动机启动液</span><span class="s2">,</span><span class="s1">松节油</span><span#}
+{#                            class="s2">,</span><span class="s1">天拿水</span><span class="s2">,</span><span#}
+{#                            class="s1">胶水</span><span class="s2">,</span><span class="s1">香水等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">D,</span><span class="s1">易燃固体</span><span class="s2">:</span><span#}
+{#                            class="s1">自然物质</span><span class="s2">,</span><span class="s1">遇水释放易燃气体的物质</span><span#}
+{#                            class="s2">,</span><span class="s1">如活性炭</span><span class="s2"> </span><span#}
+{#                            class="s1">钛粉</span><span class="s2"> </span><span class="s1">椰肉干</span><span#}
+{#                            class="s2"> </span><span class="s1">蓖麻制品</span><span class="s2"> </span><span class="s1">橡胶碎片</span><span#}
+{#                            class="s2"> </span><span class="s1">安全火柴</span><span class="s2">(</span><span class="s1">盒擦的或片擦的</span><span#}
+{#                            class="s2">) </span><span class="s1">干燥白磷</span><span class="s2"> </span><span class="s1">干燥黄磷</span><span#}
+{#                            class="s2"> </span><span class="s1">镁粉等</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s2">E,</span><span class="s1">氧化剂和有机过氧化物</span><span#}
+{#                            class="s2">:</span><span class="s1">如高锰酸钾</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1">三</span><span class="s2">:</span><span class="s1">明确禁止邮寄物品</span></p>#}
+{##}
+{#                    <p class="p1"><span class="s1">各种武器，仿真武器：子弹、枪支、地雷、弓箭、瞄准器、枪械配件等；各种烈性毒药</span><span#}
+{#                            class="s2">, </span><span class="s1">鸦片、吗啡、海洛英以及其它能使人成瘾的麻醉品、精神药物等；易燃、易爆品：打火机、打火机油、油漆、涂料、香水、指甲油、美甲凝胶、稀释剂、光漆、火柴、炭、雷管、锂电池、油、硫磺、烟花、炸药等；含有酒精的液体，碳酸饮料（瓶装）；酒类（酒精含量不超过</span><span#}
+{#                            class="s2">20</span><span class="s1">度）标有【火气严禁】的商品；高压喷雾类型的增发剂、止汗剂、瓶装液化气、摩斯、脱毛喷雾等；高压喷雾罐、打火机补充瓦斯、潜水用氧气瓶、露营用瓦斯炉罐装瓦斯、灭火器、高压除尘空气罐、携带式氧气罐、氦气瓶、氯氟烃、瓦斯暖炉汽车悬吊系统；染发剂、精油、香薰、香水、指甲油、洗甲水、发胶、</span><span#}
+{#                            class="s2"> </span><span class="s1">漂白剂、胶水、发蜡、双眼皮胶及其它含胶水及酒精成分的化妆品。冷冻品、冷藏品、生鲜食品；容易腐烂的物品（鲜鱼、鲜肉、鲜蛋、鲜蔬菜）；带有危险性病菌</span><span#}
+{#                            class="s2">,</span><span class="s1">虫害及其它有害生物的动物</span><span class="s2">,</span><span#}
+{#                            class="s1">植物及其产品；贵重金属、宝石、磁性物质、水银、消臭剂、酸化物、气体、草席、气化性物品、冰。对中国政治、经济、文化、道德有害的印刷品、胶卷、照片、唱片、影片、录音带、录像带、激光视盘、计算机存储介质及其他物品；其他物品：磁铁、引擎、干冰、石绵、毒品、麻药、精神药品、猥亵的物品、彩券、空气枪、模造刀</span><span#}
+{#                            class="s2">(</span><span class="s1">美术刀</span><span class="s2">)</span><span class="s1">、家畜饲料、植物、生鲜食品、活体动物</span><span#}
+{#                            class="s2">(</span><span class="s1">华盛顿条约</span><span class="s2">)</span><span class="s1">、含有血液的制剂品、宝石、钻石</span><span#}
+{#                            class="s2">(</span><span class="s1">包含加工品</span><span class="s2">)</span><span class="s1">、伪造货币、邮票或印花、个人文件、有价证券、国宝、重要文化遗产、重要美术品、拷贝光碟、盗版光碟、产地不明物品、信用卡、商品券、票券</span><span#}
+{#                            class="s2">(</span><span class="s1">演唱会门票等等</span><span class="s2">)</span><span class="s1">、机票等。</span>#}
+{#                    </p>#}
+{##}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock %}#}
+
+{% block footer %}{% include "controls/footer.html" %}{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 跳转到锚点
+        let u = window.location.hash;
+        if (u) {
+            showPost(u.slice(1))
+        }
+
+        function showPost(tag_name) {
+            var articles = $('article');
+            articles.attr('hidden', 'hidden');
+            var post = $('#' + tag_name);
+            post.removeAttr('hidden');
+            console.log(post)
+        }
+    </script>
+{% endblock %}
