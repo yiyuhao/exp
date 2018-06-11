@@ -141,7 +141,7 @@ class IdCardsZipper(object):
         # 删除zip文件
         if self.zip_file is not None:
             os.remove(self.zip_file)
-            
+
     def _set_air_waybill_no(self):
         air_waybill = AirWaybill.objects.get(pk=self.air_waybill_id)
         self.air_waybill_no = air_waybill.air_waybill_no
@@ -152,41 +152,37 @@ class IdCardsZipper(object):
         query.group_by = ['people']
         waybills = QuerySet(query=query, model=Waybill)
 
-        try:
-            # 创建excel
-            excel = Workbook()
-            excel_name = os.path.join(self.tmp_path, u'运单{}中身份证未拼合单号.xlsx'.format(self.air_waybill_no))
-            sheet = excel.active
-            sheet.title = u"身份证未拼合单号信息"
-            sheet['A1'] = u'身份证未拼合单号'
-            sheet['B1'] = u'已打包身份证双面照影印件的单号'
-            a_index = b_index = 1
+        # 创建excel
+        excel = Workbook()
+        excel_name = os.path.join(self.tmp_path, u'运单{}中身份证未拼合单号.xlsx'.format(self.air_waybill_no))
+        sheet = excel.active
+        sheet.title = u"身份证未拼合单号信息"
+        sheet['A1'] = u'身份证未拼合单号'
+        sheet['B1'] = u'已打包身份证双面照影印件的单号'
+        a_index = b_index = 1
 
-            for waybill in waybills:
-                people = waybill.people
-                if people.id_card:
-                    # 写入excel
-                    b_index += 1
-                    sheet['B%d' % b_index] = waybill.cn_tracking
-                    # 提供收货人身份证影印件, 需要为JPG格式, 并且以: "分单号+"."+s.JPG"命名
-                    new_file_path = os.path.join(self.tmp_path, u'{}.s.jpg'.format(waybill.cn_tracking))
-                    # 将所有文件copy到临时文件夹
-                    shutil.copyfile(people.id_card.file.name, new_file_path)
-                # 压缩文件中同时附上一个excel表, 表中有运单没有对应拼合身份证文件的单号
-                else:
-                    a_index += 1
-                    sheet['A%d' % a_index] = waybill.cn_tracking
+        for waybill in waybills:
+            people = waybill.people
+            if people.id_card:
+                # 写入excel
+                b_index += 1
+                sheet['B%d' % b_index] = waybill.cn_tracking
+                # 提供收货人身份证影印件, 需要为JPG格式, 并且以: "分单号+"."+s.JPG"命名
+                new_file_path = os.path.join(self.tmp_path, u'{}.s.jpg'.format(waybill.cn_tracking))
+                # 将所有文件copy到临时文件夹
+                shutil.copyfile(people.id_card.file.name, new_file_path)
+            # 压缩文件中同时附上一个excel表, 表中有运单没有对应拼合身份证文件的单号
+            else:
+                a_index += 1
+                sheet['A%d' % a_index] = waybill.cn_tracking
 
-            excel.save(excel_name)
+        excel.save(excel_name)
 
-            # 压缩
-            zip_filename = zip_dir(
-                src_path=self.tmp_path,
-                des_path=self.base_path,
-                file_name=self.air_waybill_no
-            )
+        # 压缩
+        zip_filename = zip_dir(
+            src_path=self.tmp_path,
+            des_path=self.base_path,
+            file_name=self.air_waybill_no
+        )
 
-            return zip_filename
-        except Exception as e:
-            self.exception = e
-            return None
+        return zip_filename

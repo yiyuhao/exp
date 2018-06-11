@@ -26,18 +26,6 @@ class WaybillAdmin(admin.ModelAdmin):
 
     inlines = [GoodInLine, WaybillStatusInLine]
 
-    readonly_fields = [
-        "tracking_no",
-        "cn_tracking",
-        'third_party_tracking_no',
-        'status',
-        'people',
-        "express_fee",
-        "package_fee",
-        "tax_fee",
-        "is_billed"
-    ]
-
     list_display = [
         "tracking_no",
         "cn_tracking",
