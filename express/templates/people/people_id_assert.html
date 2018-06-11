@@ -202,9 +202,6 @@
                                 }
                             }
                             base64 = canvas.toDataURL("image/jpeg", 0.8);
-                        } else if (navigator.userAgent.match(/Android/i)) {// 修复android
-                            let encoder = new JPEGEncoder();
-                            base64 = encoder.encode(ctx.getImageData(0, 0, expectWidth, expectHeight), 80);
                         } else {
                             if (Orientation !== "" && Orientation !== 1) {
                                 switch (Orientation) {
