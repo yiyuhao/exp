@@ -22,9 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'x*2strm2o*rvuz()@yvtl5c)1h2@rrw!r+nn1t)u_hl60a3y!#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['.huskyex.com']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
