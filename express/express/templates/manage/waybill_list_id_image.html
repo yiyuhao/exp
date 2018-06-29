@@ -1,0 +1,154 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block head_title %}
+    审核身份证照片
+{% endblock %}
+
+{% block css %}
+    <style>
+        .row {
+            margin: 30px 0;
+        }
+
+        .review {
+            margin-top: 25px;
+        }
+
+        .id-card-thumbnail {
+            width: 143px;
+            height: 90px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="row">
+            <div class="input-group col-sm-10 col-sm-offset-1">
+                <input type="text" id="search-keywords" class="form-control" placeholder="输入姓名,电话,身份证进行搜索"
+                       value="{% if keywords %}{{ keywords }}{% endif %}">
+                <span class="input-group-btn">
+                        <button class="btn btn-default" id="search-button" type="button" onclick="search()">搜索</button>
+                    </span>
+            </div>
+        </div>
+
+        {% if not people %}
+            <div style="text-align: center">
+                <h4>没有找到需要审核的身份证图片</h4>
+            </div>
+        {% else %}
+            {% for person in people %}
+                <div class="row">
+                    <div class="col-sm-2 col-sm-offset-2">
+                        <ul class="list-unstyled">
+                            <li>{{ person.name }}</li>
+                            <li>{{ person.id_no }}</li>
+                            <li>{{ person.mobile }}</li>
+                            <li>
+                                {% if person.get_status_display == '待审核' %}
+                                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                                {% elif person.get_status_display == '审核通过' %}
+                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                {% elif person.get_status_display == '审核不通过' %}
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                {% endif %}
+                                {{ person.get_status_display }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-sm-2">
+                        <img class="id-card-thumbnail" src="{{ MEDIA_URL }}{{ person.id_card_front }}">
+                    </div>
+
+                    <div class="col-sm-2">
+                        <img class="id-card-thumbnail" src="{{ MEDIA_URL }}{{ person.id_card_backside }}">
+                    </div>
+
+                    <div class="col-sm-2" style="text-align: right">
+                        {% if person.get_status_display != '待审核' %}
+                            <button class="btn btn-default review" onclick="review({{ person.id }})">
+                                重新审核
+                            </button>
+                        {% else %}
+                            <button class="btn btn-primary review" onclick="review({{ person.id }})">
+                                审核
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="col-sm-8 col-sm-offset-2">
+                {% load i18n %}
+                <nav id="pc_pagination" class="text-center">
+                    <ul class="pagination">
+                        {% if people.has_previous %}
+                            <li>
+                                <a href="?{% if keywords == '' or keywords %}keywords={{ keywords }}&{% endif %}page={{ people.previous_page_number }}"
+                                   aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                        {% else %}
+                            <li class="disabled"><a href="#" aria-label="Previous"><span
+                                    aria-hidden="true">&laquo;</span></a></li>
+                        {% endif %}
+                        {% for page in people.paginator.page_range %}
+                            {% if page %}
+                                {% ifequal page people.number %}
+                                    <li class="active"><a href="#">{{ page }} <span
+                                            class="sr-only">{{ page }}</span></a></li>
+                                {% else %}
+                                    <li>
+                                        <a href="?{% if keywords == '' or keywords %}keywords={{ keywords }}&{% endif %}page={{ page }}">{{ page }} </a>
+                                    </li>
+                                {% endifequal %}
+                            {% else %}
+                                <li><a href="#">...</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if people.has_next %}
+                            <li>
+                                <a href="?{% if keywords == '' or keywords %}keywords={{ keywords }}&{% endif %}page={{ people.next_page_number }}"
+                                   aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                        {% else %}
+                            <li class="disabled"><a href="#" aria-label="Next"><span
+                                    aria-hidden="true">&raquo;</span></a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/utils1017.js' %}"></script>
+    <script src="{% static 'js/cropper.min.js' %}"></script>
+    <script>
+
+        let search = function () {
+            let key = $('#search-keywords').val();
+            window.location.href = `{% url 'review-id-image' %}?keywords=${key}`;
+        };
+
+        let review = function (id) {
+            window.location.href = `{% url 'review-id-image' %}?id=${id}`;
+        };
+
+        // input on enter press, trigger btn click
+        let search_input = document.getElementById("search-keywords");
+        search_input.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                document.getElementById("search-button").click();
+            }
+        });
+
+        $(function () {
+        });
+    </script>
+{% endblock %}

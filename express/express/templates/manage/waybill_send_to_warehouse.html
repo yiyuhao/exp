@@ -1,0 +1,89 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    发往集运仓
+{% endblock %}
+{% block content %}
+    <div class="col-xs-12">
+        <h3>发往集运仓</h3>
+    </div>
+
+    <!-- 条码扫描区 -->
+    <div class="col-xs-12">
+        <div class="col-xs-12">
+            <label for="waybill_input">输入运单号回车</label>
+            <input id="waybill_input" type="text" style="width: 100%;"/>
+        </div>
+    </div>
+
+    <!-- 状态显示区 -->
+    <div class="col-xs-12">
+        <div class="col-xs-12">
+            <div id="waybill_list">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>运单号</th>
+                        <th>国内单号</th>
+                        <th>新状态</th>
+                        <th>信息</th>
+                    </tr>
+                    </thead>
+                    <tbody id="sent_list">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% include "sound_alert_module.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            let total = 0;
+            let waybill_input = $('#waybill_input');
+            let sent_list = $('#sent_list');
+            waybill_input.keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $.post("/api-ajax/waybill-send-to-warehouse/", {
+                        'tracking': waybill_input.val()
+                    }, function (data) {
+                        console.log(data);
+                        total += 1;
+                        cl = 'success';
+                        if (data.succ) {
+                        }
+                        else {
+                            cl = 'danger';
+                            sound_alert('错误', data.msg);
+                        }
+                        w = data.w;
+                        content = '<tr class="' + cl + '">';
+                        content += '<td>' + total + '</td>' +
+                            '<td>' + (w != undefined ? w.tracking_no : '') + '</td>' +
+                            '<td>' + (w != undefined ? w.cn_tracking : '') + '</td>' +
+                            '<td>' + (w != undefined ? w.status : '') + '</td>' +
+                            '<td>' + data.msg + '</td>';
+                        content += '</tr>';
+                        sent_list.prepend($(content))
+                    });
+                    waybill_input.select();
+                }
+            });
+
+            function activateMessage(css, message) {
+                ajax_return_alert($('#message_display_text'), css, message);
+            }
+
+
+        })
+    </script>
+
+{% endblock %}

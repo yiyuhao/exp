@@ -1,0 +1,194 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head_title %}
+    查单
+{% endblock %}
+{% block content %}
+    <div class="col-xs-12">
+        <h3>查单</h3>
+    </div>
+
+    <!-- 条码扫描区 -->
+    <div class="col-xs-12">
+        <div class="col-xs-12">
+            <label for="waybill_input">输入运单号查商品</label>
+            <input id="waybill_input" type="text" style="width: 100%;"/>
+        </div>
+    </div>
+
+    <!-- 状态显示区 -->
+    <div class="col-xs-12">
+        <div class="col-xs-12">
+            <div id="waybill_list">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th>运单号</th>
+                        <th>国内单号</th>
+                        <th>状态</th>
+                        <th>货架</th>
+                        <th>商品信息</th>
+                    </tr>
+                    </thead>
+                    <tbody id="waybill_body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% include "sound_alert_module.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            let waybill_input = $('#waybill_input');
+            let waybill_body = $('#waybill_body');
+            waybill_input.keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $.post("/api-ajax/waybill-detail/", {
+                        'tracking': waybill_input.val()
+                    }, function (data) {
+                        if (data.succ) {
+                            w = data.waybill_obj;
+                            waybill_body.empty();
+                            content = '<tr>';
+                            content += '<td>' + w.tracking_no + '</td>' +
+                                '<td>' + w.cn_tracking + '</td>' +
+                                '<td>' + w.status + '</td>' +
+                                '<td>' + w.shelf_no + '</td>';
+                            goods_table = '<td><table class="table table-bordered table-responsive">' +
+                                '<thead><tr>' +
+                                '<td>架</td>' +
+                                '<td>图</td>' +
+                                '<td>码</td>' +
+                                '<td>数</td>' +
+                                '<td>描述</td>' +
+                                '</tr></thead><tbody>';
+
+                            for (let i = 0; i < w.goods.length; i++) {
+                                g = w.goods[i];
+                                goods_table += '<tr>' +
+                                    '<td>' + g.shelf_no + '</td>' +
+                                    '<td><img class="img" style="max-width: 200px; max-height: 200px" src="' + g.img_url + '"></td>' +
+                                    '<td>' + g.sku + '</td>' +
+                                    '<td>' + g.quantity + '</td>' +
+                                    '<td><strong>' + g.brand + '</strong><br/>' + g.description + '</td>'
+                            }
+
+                            goods_table += '</tbody></table></td>';
+                            content += goods_table + '</tr>';
+                            waybill_body.append($(content))
+                        }
+                        else {
+                            alert(data.msg)
+                        }
+                    });
+                    waybill_input.select();
+                }
+            });
+
+            function waybill_check() {
+
+                if (waybill_input.val() != "") {
+
+                    $.post("/api-ajax/waybill-detail/", {
+                        'tracking': waybill_input.val()
+                    }, function (data) {
+                        //console.log(data);
+                        goodsListHtml = "";
+
+                        if (data.goods.length > 0) {
+                            goodsListHtml = '<ul>';
+                            for (var i = 0; i < data.goods.length; i++) {
+                                goodsListHtml +=
+                                    '<li>' +
+                                    data.goods[i] +
+                                    '</li>'
+                            }
+                            goodsListHtml += '</ul>'
+                        }
+
+                        ajax_post_body.prepend(
+                            $('<tr class=' + css[data.code] + '>' +
+                                '<td>' +
+                                (++ajax_waybill_cnt) +
+                                '</td>' +
+                                '<td>' +
+                                src_loc_name[in_warehouse] + ", " + cleaned_sku +
+                                '</td>' +
+                                '<td>' +
+                                data.tracking_no +
+                                '</td>' +
+                                '<td>' +
+                                messages[data.code] +
+                                goodsListHtml +
+                                '</td>' +
+                                '</tr>')
+                        );
+                        cnt[data.code] += 1;
+                        cnt_elem[data.code].text(cnt[data.code]);
+
+                        if (data.code == 0) {
+                            waybill_input.focus();
+                            var wnd = window.open(data.link, '_blank');
+
+                            //自动关闭
+                            setTimeout(function () {
+                                wnd.close();
+                            }, 6000);
+
+                            $.post("/api-ajax/waybill-check-form/", {"tracking_no": data.tracking_no}, function (data) {
+                                render_waybill(data);
+                            })
+                        } else {
+                            waybill_input.blur();
+                            sound_alert(data.tracking_no + messages[data.code], "打单暂停");
+                            activateMessage('info', "请在左侧输入框输入sku")
+
+                        }
+                    })
+                }
+            }
+
+            function activateMessage(css, message) {
+                ajax_return_alert($('#message_display_text'), css, message);
+            }
+
+            function render_waybill(data) {
+
+                // 显示message
+                activateMessage(code_class[data.code], code[data.code]);
+                clean_template();
+
+
+                // 绑定数据
+                if (data.code == 0 || data.code == 2 || data.code == 3) {
+                    tracking_no_p.text(data.waybill_obj.tracking_no);
+                    waybill_id_hid.val(data.waybill_obj.id);
+                    status_p.text(data.waybill_obj.status);
+                    user_p.text(data.waybill_obj.user);
+                    cn_tracking_p.text(data.waybill_obj.cn_tracking);
+
+                    $(data.waybill_obj.goods).each(function (i, e) {
+                        var row = $("<tr/>");
+                        goods_tbody.append(row);
+                        row.append('<td>' + e.hs_type + '</td>');
+                        row.append('<td>' + e.brand + '</td>');
+                        row.append('<td>' + e.description + '</td>');
+                        row.append('<td>' + e.quantity + '</td>');
+                        row.append('<td>' + e.unit_weight + '</td>');
+                    });
+                }
+            }
+
+
+        })
+    </script>
+
+{% endblock %}

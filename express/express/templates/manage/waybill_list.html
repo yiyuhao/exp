@@ -1,0 +1,579 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block head_title %}
+    运单管理
+{% endblock %}
+
+{% block css %}
+    <style type="text/css">
+        .delete > a {
+            color: red
+        }
+    </style>
+
+{% endblock css %}
+
+
+{% block content %}
+    {% crispy form form.helper %}
+
+    {% if perms.waybills.can_do_waybill_action %}
+        {% crispy form_action form_action.helper %}
+    {% endif %}
+
+    {% render_table table %}
+
+    <div class="modal" id="delete_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="delete_modal_text" style="text-align: center"></h5>
+                    <p id="delete_modal_fail_message" style="display: none; color: red;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="delete_modal_confirm" type="button" class="btn btn-danger">确认删除吗</button>
+                    <input id="delete_modal_url" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id='action_modal' class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">执行结果</h4>
+                </div>
+                <div id="action_modal_body" class="modal-body">
+                    总数:<p id="action_total_p"></p>
+                    成功数:<p id="action_total_succ_p"></p>
+                    详情:<p id="action_msg"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="goods_model" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 id="goods_title" style="text-align: center"><p id="goods_model_tracking"></p>商品明细</h5>
+                    <table class="table table-responsive table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>条码</th>
+                            <th>个数</th>
+                            <th>品牌</th>
+                            <th>描述</th>
+                            <th>净重</th>
+                            <th>图</th>
+                        </tr>
+                        </thead>
+                        <tbody id="goods_tbody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id='file_modal' class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">文件操作</h4>
+                </div>
+                <div id="file_modal_body" class="modal-body">
+                    结果:<p id="file_action_msg"></p>
+                    文件:<a id="file_link" href="" target="_blank">链接</a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "js/utils1017.js" %}'></script>
+    <script>
+        $(function () {
+            ajaxSetup();
+            set_up_datepicker();
+
+            var action_btn = $('#submit-id-action-submit');
+            var action_select = $('#id_action');
+            var file_input = $('#id_file');
+            var file;
+            var action_modal = $('#action_modal');
+            var action_modal_body = $('#action_modal_body');
+            var action_total_p = $('#action_total_p');
+            var action_total_succ_p = $('#action_total_succ_p');
+            var action_msg = $('#action_msg');
+            var status_sel = $('#id_status');
+            var search_input = $('#id_search');
+            var dt_start = $('#id_dt_start');
+            var dt_end = $('#id_dt_end');
+            var src_loc = $('#id_src_loc');
+            var channel = $('#id_channel');
+            var goods_tbody = $('#goods_tbody');
+            var goods_model = $('#goods_model');
+            var goods_model_tracking = $('#goods_model_tracking');
+            var multi_search_input = $('#id_multi_search');
+            var has_person_id = $('#id_has_person_id');
+            var has_cn_tracking = $('#id_has_cn_tracking');
+            var id_change_channel = $('#id_change_channel');
+            var id_qty = $('#id_qty');
+            var in_no = $('#id_in_no');
+            var status_dt_start = $('#id_status_dt_start');
+            var status_dt_end = $('#id_status_dt_end');
+
+            var file_modal = $('#file_modal');
+            var file_action_msg = $('#file_action_msg');
+            var file_link = $('#file_link');
+
+
+            file_input.on('change', function (e) {
+                files = e.target.files;
+                if (files.length > 0) {
+                    file = files[0]
+                }
+            });
+
+            action_btn.click(function () {
+                clean_up_action_modal();
+                action = action_select.val().trim();
+                if (action == "2" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        url: '/api-ajax/waybill-usps-update/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            if (!data.succ) {
+                                var ul = $('<ul></ul>');
+                                $.each(data.msg, function (i, v) {
+                                    ul.append(
+                                        "<li>" +
+                                        v +
+                                        "</li>");
+                                });
+                                action_msg.append(ul);
+
+                            }
+                            else {
+                                action_msg.text(data.msg)
+                            }
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    })
+                } else if (action == 3) {
+                    window.open("/manage/export-waybill/?" +
+                        "search=" + search_input.val().trim() +
+                        "&status_order_index=" + status_sel.val() +
+                        "&dt_start=" + dt_start.val().trim() +
+                        "&dt_end=" + dt_end.val().trim() +
+                        "&src_loc=" + src_loc.val() +
+                        "&channel=" + channel.val() +
+                        "&multi_search=" + encodeURIComponent(multi_search_input.val().trim()) +
+                        "&has_person_id=" + has_person_id.val() +
+                        "&has_cn_tracking=" + has_cn_tracking.val() +
+                        "&in_no=" + in_no.val() +
+                        "&status_dt_start=" + status_dt_start.val().trim() +
+                        "&status_dt_end=" + status_dt_end.val().trim() +
+                        "&qty=" + id_qty.val().trim()
+                    );
+
+                } else if (action == "4" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        url: '/api-ajax/add-yunda/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "5") {
+                    if (search_input.val().trim() == "") {
+                        return alert("请输入建单批次号");
+                    }
+                    window.open("/api-ajax/get-virtual-yunda-excel/?" +
+                        "search=" + search_input.val().trim());
+                } else if (action == "6" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        url: '/api-ajax/update-virtual-yunda-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "7") {
+                    if (search_input.val().trim() == "") {
+                        return alert("请输入建单批次号");
+                    }
+                    window.open("/api-ajax/get-bdt-yunda-excel/?" +
+                        "search=" + search_input.val().trim());
+                } else if (action == "8") {
+                    if (search_input.val().trim() == "") {
+                        return alert("请输入建单批次号");
+                    }
+                    window.open("/api-ajax/get-qd-ems-excel/?" +
+                        "search=" + search_input.val().trim());
+                } else if (action == "9" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    data.append('channel_name', id_change_channel.val());
+                    $.ajax({
+                        url: '/api-ajax/update-cn-tracking-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "10" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        url: '/api-ajax/update-package-weight-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "11") {
+                    if (search_input.val().trim() == "" && multi_search_input.val().trim() == "") {
+                        alert("请至少输入建单批次号或多个美国运单号");
+                        return
+                    }
+                    $.ajax({
+                        url: '/api-ajax/get-labels/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify({'tracking_nos': multi_search_input.val(), 'in_no': search_input.val()}),
+                        contentType: "application/json",
+                        success: function (data) {
+                            //console.log(data);
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                            if (data.succ) window.open(data.url);
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == '12') {
+                    window.open("/manage/export-waybill-address/?" +
+                        "search=" + search_input.val().trim() +
+                        "&status_order_index=" + status_sel.val() +
+                        "&dt_start=" + dt_start.val().trim() +
+                        "&dt_end=" + dt_end.val().trim() +
+                        "&src_loc=" + src_loc.val() +
+                        "&channel=" + channel.val() +
+                        "&multi_search=" + encodeURIComponent(multi_search_input.val().trim()) +
+                        "&has_person_id=" + has_person_id.val() +
+                        "&has_cn_tracking=" + has_cn_tracking.val() +
+                        "&in_no=" + in_no.val()
+                    );
+                } else if (action == "13" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    data.append('channel_name', id_change_channel.val());
+                    $.ajax({
+                        url: '/api-ajax/change-cn-tracking-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "14" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    data.append('channel_name', id_change_channel.val());
+                    $.ajax({
+                        url: '/api-ajax/change-channel-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "15") {
+                    data = new FormData();
+                    $.ajax({
+                        url: '/api-ajax/auto-create/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "16" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        url: '/api-ajax/insert-ems-mark-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "17") {
+                    data = new FormData();
+                    data.append('sku', search_input.val());
+                    data.append('src_loc', src_loc.val());
+                    data.append('channel', channel.val());
+                    data.append('qty', id_qty.val());
+
+                    $.ajax({
+                        url: '/api-ajax/bulk-print-sku/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data.succ) {
+                                window.open(data.url);
+                            } else {
+                                action_msg.text(data.msg);
+                                action_modal.modal('show');
+                            }
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "18") {
+                    window.open("/manage/custom-data/?" +
+                        "&channel=" + id_change_channel.val() +
+                        "&multi_search=" + encodeURIComponent(multi_search_input.val().trim().split('\n').join(','))
+                    );
+                } else if (action == "19" && file) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        url: '/api-ajax/change-name-excel/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            action_total_p.text(data.total);
+                            action_total_succ_p.text(data.succ_cnt);
+                            action_msg.text(data.msg);
+                            action_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "20") {
+                    data = {
+                        'dt_start': dt_start.val().trim(),
+                        'dt_end': dt_end.val().trim(),
+                        'air_waybill_no': search_input.val().trim()
+                    };
+                    // 时间范围
+                    // 航空批次号
+                    $.ajax({
+                        url: '/api-ajax/waybills-time/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: true,
+                        success: function (data) {
+                            file_action_msg.text(data.msg);
+                            file_link.attr('href', data.link);
+                            if (data.link == "")
+                                file_link.hide();
+                            else file_link.show();
+                            file_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "21") {
+                    data = {
+                        'dt_start': dt_start.val().trim(),
+                    };
+                    $.ajax({
+                        url: '/api-ajax/waybills-send-days/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        processData: true,
+                        success: function (data) {
+                            file_action_msg.text(data.msg);
+                            file_link.attr('href', data.link);
+                            if (data.link == "")
+                                file_link.hide();
+                            else file_link.show();
+                            file_modal.modal('show');
+                        },
+                        error: function () {
+                            alert('发生异常')
+                        }
+                    });
+                } else if (action == "22") {
+                    window.open("/api-ajax/get-export-q-excel/?" +
+                        "&src_loc=" + src_loc.val());
+                }
+                else if (action == "23") {
+                    window.open("/api-ajax/get-k-no-pic-excel/?" +
+                        "&air_waybill=" + search_input.val().trim());
+                }
+
+                return false;
+            });
+
+            function clean_up_action_modal() {
+                $.each(action_total_p.find("p"), function () {
+                    $(this).text("")
+                })
+            }
+
+            action_modal.on('hide.bs.modal', function () {
+                location.reload();
+            });
+
+            $('.status').popover();
+
+            function clean_up_goods_modal() {
+                goods_tbody.children().remove();
+            }
+
+            $('.goods-detail').click(function () {
+                url = $(this).attr('data-toggle');
+                clean_up_goods_modal();
+                $.get(url, function (data) {
+                    $.each(data["goods"], function (i, e) {
+                        tr = $('<tr></tr>');
+                        tr.append(
+                            $('<td>' + e.sku + '</td>' +
+                                '<td>' + e.quantity + '</td>' +
+                                '<td>' + e.brand + '</td>' +
+                                '<td>' + e.description + '</td>' +
+                                '<td>' + e.unit_weight + '</td>' +
+                                '<td><img class=\"img-rounded\" style=\"max-width: 100px; max-height: 100px\" src=\"' + e.img_url + '\">' + '</td>'
+                            ));
+                        goods_tbody.append(tr);
+                        goods_model.modal('show');
+                        goods_model_tracking.text(data["tracking_no"]);
+                    })
+
+                });
+
+                return false
+            });
+
+        })
+    </script>
+{% endblock %}

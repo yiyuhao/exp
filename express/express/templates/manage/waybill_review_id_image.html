@@ -1,0 +1,231 @@
+{% extends "manage/manage_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
+    <style>
+        .row {
+            margin-bottom: 20px;
+        }
+
+        #id_front {
+            max-width: 100%;
+        }
+
+        #id_backside {
+            max-width: 100%;
+        }
+
+        .img-preview {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block head_title %}
+    审核身份证照片
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <p id="message_display_text" class="alert alert-info">裁剪并审核身份证正反面影印件(将按照上下顺序拼接为一张身份证图片)</p>
+
+        <div class="row">
+            <div class="input-group col-sm-10 col-sm-offset-1">
+                <input type="text" id="split_group" class="form-control" placeholder="分组个数">
+                <input type="text" id="start_index" class="form-control" placeholder="第几组">
+                <input type="text" id="search-keywords" class="form-control" placeholder="输入姓名,电话,身份证进行搜索">
+                <span class="input-group-btn">
+                        <button class="btn btn-default" id="search-button" type="button" onclick="search()">搜索</button>
+                    </span>
+                <strong>待审核总数: {{ total }}</strong>
+            </div>
+        </div>
+        {% if not people %}
+            <div style="text-align: center">
+                <h4>没有找到需要审核的身份证图片</h4>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-sm-4">
+                    <dl class="dl-horizontal">
+                        <dt>姓名</dt>
+                        <dd>{{ people.name }}</dd>
+                        <dt>身份证号</dt>
+                        <dd>{{ people.id_no }}</dd>
+                        <dt>手机号</dt>
+                        <dd>{{ people.mobile }}</dd>
+                        <dt>状态</dt>
+                        <dd>{{ people.get_status_display }}</dd>
+                    </dl>
+                </div>
+                <div class="col-sm-6">
+                    <button class="btn btn-primary" onclick="exchange()">交换身份证正反面照片</button>
+                    <button class="btn btn-primary" onclick="upload()">裁剪并通过审核</button>
+                    <button class="btn btn-primary" onclick="upload(reject=true)">不通过</button>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-sm-10">
+
+                        <div class="col-sm-6" style="text-align: center">
+                            <img id="id_front" src="{{ MEDIA_URL }}{{ people.id_card_front }}">
+                            <button class="btn btn-primary" onclick="rotate(img='#id_front', degree=-90)"><span
+                                    class="fa fa-rotate-left"></span> 旋转90°
+                            </button>
+                            <button class="btn btn-primary" onclick="rotate(img='#id_front', degree=90)"><span
+                                    class="fa fa-rotate-right"></span> 旋转90°
+                            </button>
+                        </div>
+                        <div class="col-sm-6" style="text-align: center">
+                            <img id="id_backside" src="{{ MEDIA_URL }}{{ people.id_card_backside }}">
+                            <button class="btn btn-primary" onclick="rotate(img='#id_backside', degree=-90)"><span
+                                    class="fa fa-rotate-left"></span> 旋转90°
+                            </button>
+                            <button class="btn btn-primary" onclick="rotate(img='#id_backside', degree=90)"><span
+                                    class="fa fa-rotate-right"></span> 旋转90°
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-2 ">
+                        <div>
+                            <p>预览：</p>
+                            <div class="img-preview" id="id_front_preview"></div>
+                            <div class="img-preview" id="id_backside_preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/utils1017.js' %}"></script>
+    <script src="{% static 'js/cropper.min.js' %}"></script>
+    <script>
+
+        // input on enter press, trigger btn click
+        let search_input = document.getElementById("search-keywords");
+        search_input.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                document.getElementById("search-button").click();
+            }
+        });
+
+        let search = function () {
+            let key = $('#search-keywords').val();
+            let split_group = $('#split_group').val();
+            let start_index = $('#start_index').val();
+            window.location.href = `{% url 'review-id-image' %}?keywords=${key}&split_group=${split_group}&start_index=${start_index}`;
+        };
+
+        let initCropper = function (img, preview_div_id) {
+            let $image = img;
+            let options = {
+                aspectRatio: 85.6 / 54, // 身份证纵横比(85.6mm:54mm)
+                viewMode: 2,
+                preview: preview_div_id // 预览图的class名
+            };
+            // 销毁cropper后更改src属性再重新创建cropper
+            $image.cropper('destroy').attr('src', $image.attr('src')).cropper(options);
+        };
+
+        // 交换身份证正反面照
+        let exchange = function () {
+            let $front = $('#id_front');
+            let $back = $('#id_backside');
+            // 交换img src属性
+            let [front_url, back_url] = [$front.attr('src'), $back.attr('src')];
+            $front.attr('src', back_url);
+            $back.attr('src', front_url);
+            redraw();
+        };
+
+        // 裁剪
+        let crop = function (img) {
+            let croppered_img = img.cropper('getCroppedCanvas', {
+                width: 85.6 * 5, // 裁剪后的长宽  不能过大, 保证文件大小
+                height: 54 * 5
+            });
+            return croppered_img.toDataURL('image/jpeg');
+        };
+
+        // 旋转
+        let rotate = function (img, degree) {
+            $(img).cropper('rotate', degree);
+        };
+
+        // upload
+        let upload = function (reject = false) {
+            // csrf token
+            ajaxSetup();
+            let message_display_text = $('#message_display_text');
+            let id_card_front = null;
+            let id_card_backside = null;
+            if (!reject) {
+                id_card_front = crop($('#id_front'));
+                id_card_backside = crop($('#id_backside'));
+            }
+
+            let form_data = new FormData();
+            if (!reject) {
+                form_data.append('id_card_front', id_card_front);
+                form_data.append('id_card_backside', id_card_backside);
+            }
+            form_data.append('person_id', {{ people.id }});
+            form_data.append('reject', reject);
+
+            $.ajax({
+                'url': '/manage/review-id-image/',
+                'type': 'POST',
+                'processData': false,
+                'contentType': false,
+                'data': form_data,
+                'dataType': 'json',
+                'success': function (data) {
+                    data = data.data;
+                    if (data.succ) {
+                        ajax_return_alert(message_display_text, 'success', data.msg);
+                        setTimeout(() => {
+                            location.reload()
+                        }, 500);
+                    } else {
+                        ajax_return_alert(message_display_text, 'danger', data.msg);
+                    }
+                },
+                'error': function (data) {
+                    ajax_return_alert(message_display_text, 'danger', "网络异常");
+                }
+            });
+        };
+
+        // 绘制裁剪框
+        let redraw = function () {
+            initCropper($('#id_front'), '#id_front_preview');
+            initCropper($('#id_backside'), '#id_backside_preview');
+        };
+
+        $(function () {
+            redraw();
+            q = {};
+            var urlParams = new URLSearchParams(window.location.search);
+            for (k of urlParams.entries()) {
+                q[k[0]] = k[1]
+            }
+            $('#split_group').val(q["split_group"]);
+            $('#start_index').val(q["start_index"]);
+            $('#search-keywords').val(q["keywords"]);
+        });
+    </script>
+{% endblock %}
