@@ -12,6 +12,9 @@ class IndexView(View):
     """首页"""
 
     def get(self, request):
+        from t import gen_waybill_pdfs
+        gen_waybill_pdfs('hangkongtidanhao')
+
         # 轮播图
         banners = Banner.objects.order_by('index').all()[:2]
 

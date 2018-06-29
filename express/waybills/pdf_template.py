@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import random
 from decimal import Decimal
+import os
 
 from django.http import HttpResponse
 from reportlab.graphics.barcode import code128, code39, code93
@@ -1853,7 +1854,7 @@ def one_pdf_write(obj, fname=None):
     pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
 
     fname = str(uuid.uuid1()) + ".pdf" if not fname else fname
-    fpath = settings.MEDIA_ROOT + "/" + fname
+    fpath = os.path.join(settings.MEDIA_ROOT, fname)
 
     c = Canvas(fpath, pagesize=R4)
 
