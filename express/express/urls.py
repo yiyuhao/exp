@@ -139,6 +139,7 @@ urlpatterns = [
         name='manage-waybill-send-to-warehouse-ajax'),
     url(r'^api-ajax/sifang_pdf/$', get_sifang_pdf, name='sifang-pdf-ajax'),
     url(r'^api-ajax/get-k-no-pic-excel/$', get_k_no_pid_excel, name='k-no-pic-ajax'),
+    url(r'^api-ajax/import-waybill-excel/$', import_waybill_excel_view, name='import-waybill-excel'),
 
     # app
     url('^$', IndexView.as_view(), name='index'),
@@ -192,6 +193,7 @@ urlpatterns = [
     url(r'^manage/waybill-send-to-warehouse/$', manage_waybill_send_to_warehouse_view,
         name='manage-waybill-send-to-warehouse'),
     url(r'^manage/waybill-check-detail/$', manage_waybill_detail_view, name='manage-waybill-check-detail'),
+    url(r'^manage/waybills-import/$', manage_waybills_import_view, name='manage-waybills-import'),
 
     url(r'^api-test/$', api_test, name='api-test'),
 

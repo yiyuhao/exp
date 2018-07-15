@@ -32,17 +32,26 @@
                                     </small> {% endif %}
                             </th>
                         </tr>
-                        {% if waybill.has_person_id  and waybill.person_id_update_dt %}
+                        {% if waybill.lack_person_id_pic %}
                             <tr>
-                                <td colspan="2">顾客上传身份证时间: {{ waybill.person_id_update_dt }}</td>
+                                <td colspan="2">该包裹缺少身份证正反面照片, 无法清关, 请补交
+                                    <a href="/u/?m={{ waybill.tracking_no }}" class="btn btn-success btn-sm">
+                                        <i class="fa fa-upload"></i>自助上传</a>
+                                </td>
                             </tr>
+                        {% else %}
+                            {% if waybill.has_person_id and waybill.person_id_update_dt %}
+                                <tr>
+                                    <td colspan="2">顾客上传身份证时间: {{ waybill.person_id_update_dt }}</td>
+                                </tr>
+                            {% endif %}
                         {% endif %}
                         {% for status in waybill.status_set %}
                             <tr>
                                 <td>{{ status.create_dt }}</td>
                                 <td>{{ status.status__name }}
                                     {% if manage and status.remark %} 备注: {{ status.remark }} {% endif %}
-                                    {% if not waybill.has_person_id %}
+                                    {% if not waybill.has_person_id and '已建单' in status.status__name and not waybill.lack_person_id_pic %}
                                         ,待收件人上传身份证
                                         <a href="/u/?m={{ waybill.tracking_no }}" class="btn btn-success btn-sm">
                                             <i class="fa fa-upload"></i>自助上传</a>

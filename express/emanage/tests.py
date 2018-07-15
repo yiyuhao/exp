@@ -23,20 +23,20 @@ def convert_pdf_to_jpg(input_path, output_path):
 
 def gen_waybill_pdfs(air_waybill_no):
     qs = Waybill.objects.filter(pallet__air_waybill__air_waybill_no=air_waybill_no).order_by('tracking_no')
-    cnt = 0
-    if not os.path.isdir(settings.MEDIA_ROOT + '/' + air_waybill_no):
-        os.mkdir(settings.MEDIA_ROOT + '/' + air_waybill_no)
-    else:
-        shutil.rmtree(settings.MEDIA_ROOT + '/' + air_waybill_no)
-        os.mkdir(settings.MEDIA_ROOT + '/' + air_waybill_no)
+    base_path = os.path.join(settings.MEDIA_ROOT, air_waybill_no)
+    if os.path.isdir(base_path):
+        shutil.rmtree(base_path)
+    os.mkdir(base_path)
     for w in qs:
-        fname = air_waybill_no + '/' + w.cn_tracking + '.pdf'
-        one_pdf_write(w.get_wrap_pdf(), fname)
-        fpath = settings.MEDIA_ROOT + "/" + fname
-        convert_pdf_to_jpg(fpath, fpath.replace('pdf', 'y.JPG'))
-        os.remove(fpath)
-        cnt += 1
-        print cnt
+        pdf = None
+        try:
+            pdf_name = os.path.join(air_waybill_no, w.cn_tracking + '.pdf')
+            one_pdf_write(w.get_wrap_pdf(), pdf_name)
+            pdf = os.path.join(settings.MEDIA_ROOT, pdf_name)
+            convert_pdf_to_jpg(pdf, pdf.replace('pdf', 'y.JPG'))
+        finally:
+            if pdf:
+                os.remove(pdf)
 
 
 def gen_waybill_pdfs2(folder_name, qs):

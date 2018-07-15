@@ -45,8 +45,10 @@ def upsert_person_info(name, person_id, mobile, id_card_front, id_card_backside)
     else:
         p = People.objects.filter(name=name, mobile=mobile).first()
         p.person_id = person_id
-        p.id_card_front = id_card_front
-        p.id_card_backside = id_card_backside
+        if id_card_front:
+            p.id_card_front = id_card_front
+        if id_card_backside:
+            p.id_card_backside = id_card_backside
         p.save()
     try:
         compress_id_card_image(p)

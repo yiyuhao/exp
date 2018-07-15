@@ -8,6 +8,7 @@ import random
 import sys
 from decimal import Decimal
 
+from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
 from django.db import models
 import uuid
@@ -28,6 +29,9 @@ from pypinyin import lazy_pinyin
 import json
 import pytz
 from pallets.models import *
+import datetime
+
+from .config import ACCOUNT_TYPES, PAY_CHANNELS
 
 TRACKING_NO_PREFIX = 'AB'
 TIMESTAMP_LEN = 6
@@ -257,6 +261,28 @@ class Waybill(models.Model):
                 'remark': ''
             } for g in self.goods.all()],
         }
+
+    def get_yunda_push_obj(self):
+
+        return {
+            'mailno': self.cn_tracking,
+            'mailOtherNo': self.tracking_no,
+            'traces': [{
+                'time': datetime.datetime.strftime(s.create_dt.astimezone(pytz.timezone('Asia/Shanghai')),
+                                                   '%y-%m-%d %H:%M:%S'),
+                'tz': 8,
+                'desc': s.status.description,
+                'status': 78,
+                'country': 'US',
+                'city': 'New York',
+                'facilityType': 4,
+                'facilityNo': 8888,
+                'facilityName': '士奇快递美国NJ集运中心',
+                'flightNumber': 'AC8823',
+                'extendFields': '扩展信息'
+            } for s in self.status_set.all()],
+        }
+
 
     def get_sifang_obj(self):
         return {
@@ -643,7 +669,12 @@ class Waybill(models.Model):
 
     def get_tax_fee(self, rate=None):
         if not rate:
-            rate = Currency.get_today_rate()
+            if Currency.objects.filter(create_dt__gt=self.create_dt).filter(
+                    create_dt__lt=self.create_dt + timezone.timedelta(days=1)).exists():
+                rate = Currency.objects.filter(create_dt__gt=self.create_dt).filter(
+                    create_dt__lt=self.create_dt + timezone.timedelta(days=1)).first()
+            else:
+                rate = Currency.get_today_rate()
 
         if self.channel.tax and self.goods.all().count() > 0:
             return self.goods.aggregate(total=Sum(F('quantity') * F('unit_price'), output_field=models.DecimalField()))[
@@ -1158,3 +1189,19 @@ class Currency(models.Model):
             r = fetch_usd_cnh()
             Currency.objects.create(rate=r)
             return r
+
+
+class Account(models.Model):
+    balance = models.DecimalField(max_digits=20, decimal_places=5,
+                                  validators=[MinValueValidator(0.0)])  # 余额
+    type = models.IntegerField(choices=ACCOUNT_TYPES.model_choices())
+
+
+class Payment(models.Model):
+    serial_number = models.CharField(max_length=32, primary_key=True)  # 流水号
+    datetime = models.DateTimeField(default=timezone.now, db_index=True)  # 账单创建时间
+    pay_channel = models.IntegerField(PAY_CHANNELS.model_choices())  # 支付渠道，支付宝/微信
+
+
+class Transaction(models.Model):
+    payment = models.ForeignKey(Payment, related_name='transactions', verbose_name=u'账单',)

@@ -101,6 +101,7 @@ def do_package_to_pallet(tracking_no, user, channel_id, force_add):
                 if force_add:
                     WaybillStatus.objects.create(waybill=waybill, status=status, location=loc, user=user)
                     return 0, waybill.id, ''
+
                 elif waybill.is_lux_brand():
                     return 8, 0, waybill.get_goods_content_lux()
                 elif waybill.is_lux_brand_over_limit():
@@ -169,6 +170,14 @@ def do_package_to_pallet2(tracking_no, user, force_add):
                 if force_add:
                     WaybillStatus.objects.create(waybill=waybill, status=status, location=loc, user=user)
                     return 0, waybill.id, '', waybill.channel.id, waybill.channel.name, waybill.weight
+                elif waybill.is_k_over_limit_per_batch():
+                    return 11, 0, waybill.recv_name, waybill.channel.id, waybill.channel.name, waybill.weight
+                elif waybill.channel.name in [CH19]:
+                    if waybill.people and waybill.people.id_card_front:
+                        WaybillStatus.objects.create(waybill=waybill, status=status, location=loc, user=user)
+                        return 0, waybill.id, '', waybill.channel.id, waybill.channel.name, waybill.weight
+                    else:
+                        return 12, 0, waybill.recv_name, waybill.channel.id, waybill.channel.name, waybill.weight
                 # elif waybill.is_lux_brand():
                 #     return 8, 0, waybill.get_goods_content_lux(),waybill.channel.id, waybill.channel.name, waybill.weight
                 # elif waybill.is_lux_brand_over_limit():
@@ -177,8 +186,6 @@ def do_package_to_pallet2(tracking_no, user, force_add):
                     return 9, 0, waybill.get_goods_content_lux(), waybill.channel.id, waybill.channel.name, waybill.weight
                 # elif waybill.is_over_limit_per_batch():
                 #     return 6, 0, waybill.get_goods_content_lux(),waybill.channel.id, waybill.channel.name, waybill.weight
-                elif waybill.is_k_over_limit_per_batch():
-                    return 11, 0, waybill.recv_name, waybill.channel.id, waybill.channel.name, waybill.weight
                 else:
                     WaybillStatus.objects.create(waybill=waybill, status=status, location=loc, user=user)
                     return 0, waybill.id, '', waybill.channel.id, waybill.channel.name, waybill.weight

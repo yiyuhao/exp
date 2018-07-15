@@ -15,7 +15,7 @@ from django.utils import timezone
 
 from express import settings
 from express.crypto import md5
-from pallets.models import CH12, CH17, CH18, CH19
+from pallets.models import CH12, CH17, CH18, CH19, CH23
 
 
 def toEng(chineseStr):
@@ -93,7 +93,7 @@ def check_cn_status(w):
         return None if js_obj['status'] == -1 else json.dumps(js_obj)
     # if w.channel.name in ["A1", 'A2', 'A3']:
     #     return get_cn_status(w.cn_tracking, 'yunda')
-    elif w.channel.name in [CH17, CH18, CH19]:
+    elif w.channel.name in [CH17, CH18, CH19, CH23]:
         return get_cn_status(w.cn_tracking, 'gnxb')
     else:
         if w.cn_tracking.startswith('5'):

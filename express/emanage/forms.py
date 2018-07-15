@@ -2,6 +2,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 from django import forms
+from django.contrib.auth.models import User
 from django.db.models import Q, Max, Sum
 from django.utils import timezone
 
@@ -57,6 +58,11 @@ EXCEPTION_RECORD_AREA = (
     ('', '区域'),
     ('美国', '美国'),
     ('中国', '中国')
+)
+
+WAYBILL_IMPORT_ACTIONS = (
+    (0, "--------"),
+    (1, "新单导入"),
 )
 
 
@@ -346,4 +352,28 @@ class ManagePerformanceSearchForm(forms.Form):
             'dt_st',
             'dt_ed',
             Submit('', u'查询'),
+        )
+
+
+class WaybillImportActionForm(forms.Form):
+    action = forms.ChoiceField(choices=WAYBILL_IMPORT_ACTIONS, required=False)
+    change_channel = forms.ModelChoiceField(Channel.objects.all().order_by('id'), empty_label=u'渠道',
+                                            to_field_name='name', required=False)
+    user = forms.ModelChoiceField(User.objects.filter(Q(is_active=True), Q(is_staff=False)), empty_label='用户',
+                                  to_field_name='username', required=False)
+    file = forms.FileField(allow_empty_file=False)
+
+    def __init__(self, *args, **kwargs):
+        super(WaybillImportActionForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_class = "form-inline"
+        self.helper.field_template = "bootstrap3/layout/inline_field.html"
+        self.helper.form_method = "post"
+        self.helper.form_action = ""
+        self.helper.layout = Layout(
+            'action',
+            'change_channel',
+            'user',
+            'file',
+            Submit('action-submit', u'执行'),
         )

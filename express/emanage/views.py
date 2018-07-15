@@ -42,7 +42,7 @@ from waybills.models import QFTracking
 import django_excel as excel
 from addresses.tasks import notify_user_upload_person_info2, notfiy_user_up_id_finish_packing
 from addresses.utils import id_card_images_to_one_paper
-
+import datetime
 
 @login_required(login_url='/manage/login/')
 @user_passes_test(staffCheck, login_url='/')
@@ -60,11 +60,11 @@ def performacne_view(request):
         q = Q()
         if form.cleaned_data["dt_st"]:
             dt_st = pytz.timezone(settings.TIME_ZONE).localize(
-                datetime.strptime(form.cleaned_data["dt_st"], '%m/%d/%Y'))
+                datetime.datetime.strptime(form.cleaned_data["dt_st"], '%m/%d/%Y'))
             q.add(Q(create_dt__gte=dt_st), AND)
         if form.cleaned_data["dt_ed"]:
             dt_ed = pytz.timezone(settings.TIME_ZONE).localize(
-                datetime.strptime(form.cleaned_data["dt_ed"], '%m/%d/%Y')) + timezone.timedelta(days=1)
+                datetime.datetime.strptime(form.cleaned_data["dt_ed"], '%m/%d/%Y')) + timezone.timedelta(days=1)
             q.add(Q(create_dt__lte=dt_ed), AND)
         q.add(Q(user__username__in=user_names), AND)
         q.add(Q(status__name='已发往集运仓'), AND)
@@ -538,9 +538,39 @@ def manage_waybills_view(request):
                   {'table': table, 'total': total, 'form': form, 'form_action': form_action})
 
 
-'''
- Waybill.objects.annotate(status_id=Max("status_set__id")).annotate(status_order_index=Max("status_set__status__order_index"))
-'''
+@login_required(login_url='/manage/login/')
+@user_passes_test(staffCheck, login_url='/')
+def manage_waybills_import_view(request):
+    form_action = WaybillImportActionForm(request.GET or None)
+    loc = Employee.objects.get(user=request.user).loc
+
+    return render(request, 'manage/waybill_import.html', {'form_action': form_action})
+
+
+@api_view(['POST'])
+@permission_classes([IsStaff])
+def import_waybill_excel_view(request):
+    if request.POST['user'] and User.objects.filter(username=request.POST['user']).exists():
+        user = User.objects.get(username=request.POST['user'])
+        if request.POST['change_channel'] and Channel.objects.filter(name=request.POST['change_channel']).exists():
+            channel = Channel.objects.get(name=request.POST['change_channel'])
+            if request.FILES['file']:
+                try:
+                    cnt = import_waybill_from_excel(request.FILES['file'], user, channel)
+                    return Response(data={"succ": True, "msg": "新单导入成功", "succ_cnt": cnt, "total": cnt},
+                                    content_type="application/json")
+                except Exception as e:
+                    return Response(data={"succ": False, "msg": e.message, "succ_cnt": 0, "total": 0},
+                                    content_type="application/json")
+            else:
+                return Response(data={'succ': False, 'msg': "请提供excel文件", "succ_cnt": 0, "total": 0},
+                                content_type="application/json")
+        else:
+            return Response(data={'succ': False, 'msg': "请选择渠道", "succ_cnt": 0, "total": 0},
+                            content_type="application/json")
+    else:
+        return Response(data={'succ': False, 'msg': "请选择用户", "succ_cnt": 0, "total": 0},
+                        content_type="application/json")
 
 
 @login_required(login_url='/manage/login/')
@@ -550,7 +580,7 @@ def manage_waybills_bulk_print_view(request):
     shelf_list = ''
     per_page = 10
     qs = Waybill.objects.none()
-    total_waybill_cnt, total_a1, total_a2, total_a3, total_k2, total_q = 0, 0, 0, 0, 0, 0
+    total_waybill_cnt, total_a1, total_a2, total_a3, total_a4, total_k2, total_q, total_n = 0, 0, 0, 0, 0, 0, 0, 0
     if form.is_valid():
         qs = Waybill.objects.annotate(goods_num=Sum('goods__quantity')).filter(Q(goods_num=1),
                                                                                Q(status__name__in=['已建单',
@@ -562,7 +592,8 @@ def manage_waybills_bulk_print_view(request):
         in_no = form.cleaned_data["in_no"]
         dt = form.cleaned_data["dt"]
 
-        total_a1, total_a2, total_a3, total_k2, total_q, total_waybill_cnt = cal_total_cnt(dt, qs, src_loc)
+        total_a1, total_a2, total_a3, total_a4, total_k2, total_q, total_n, total_waybill_cnt = cal_total_cnt(dt, qs,
+                                                                                                              src_loc)
 
         qs = qs.filter(Waybill.get_able_to_print_query())
 
@@ -579,7 +610,8 @@ def manage_waybills_bulk_print_view(request):
     return render(request, 'manage/waybill_print_bulk_print.html',
                   {'table': table, 'waybill_cnt': waybill_cnt, 'goods_cnt': goods_cnt, 'form': form, 'form_action': '',
                    'shelf_list': shelf_list, 'total_waybill_cnt': total_waybill_cnt, 'total_a1': total_a1,
-                   'total_a2': total_a2, 'total_a3': total_a3, 'total_k2': total_k2, 'total_q': total_q})
+                   'total_a2': total_a2, 'total_a3': total_a3, 'total_a4': total_a4, 'total_k2': total_k2,
+                   'total_q': total_q, 'total_n': total_n})
 
 
 @login_required(login_url='/manage/login/')
@@ -589,7 +621,7 @@ def manage_waybills_bulk_print_multiple_view(request):
     shelf_list = ''
     per_page = 10
     qs = Waybill.objects.none()
-    total_waybill_cnt, total_a1, total_a2, total_a3, total_k2, total_q = 0, 0, 0, 0, 0, 0
+    total_waybill_cnt, total_a1, total_a2, total_a3, total_a4, total_k2, total_q, total_n = 0, 0, 0, 0, 0, 0, 0, 0
 
     if form.is_valid():
         qs = Waybill.objects.annotate(goods_num=Sum('goods__quantity')).filter(Q(goods_num__gt=1),
@@ -600,7 +632,8 @@ def manage_waybills_bulk_print_multiple_view(request):
         channel = form.cleaned_data["channel"]
         dt = form.cleaned_data["dt"]
 
-        total_a1, total_a2, total_a3, total_k2, total_q, total_waybill_cnt = cal_total_cnt(dt, qs, src_loc)
+        total_a1, total_a2, total_a3, total_a4, total_k2, total_q, total_n, total_waybill_cnt = cal_total_cnt(dt, qs,
+                                                                                                              src_loc)
 
         qs = qs.filter(Waybill.get_able_to_print_query())
 
@@ -617,12 +650,13 @@ def manage_waybills_bulk_print_multiple_view(request):
     return render(request, 'manage/waybill_print_multiple_batch.html',
                   {'table': table, 'waybill_cnt': waybill_cnt, 'goods_cnt': goods_cnt, 'form': form, 'form_action': '',
                    'shelf_list': shelf_list, 'total_waybill_cnt': total_waybill_cnt, 'total_a1': total_a1,
-                   'total_a2': total_a2, 'total_a3': total_a3, 'total_k2': total_k2, 'total_q': total_q})
+                   'total_a2': total_a2, 'total_a3': total_a3, 'total_a4': total_a4, 'total_k2': total_k2,
+                   'total_q': total_q, 'total_n': total_n})
 
 
 def cal_total_cnt(dt, qs, src_loc):
     total_qs = qs.filter(
-        Q(src_loc=src_loc), Q(channel__name__in=['A1', 'A2', 'A3', 'K2', 'Q']),
+        Q(src_loc=src_loc), Q(channel__name__in=['A1', 'A2', 'A3', 'A4', 'K2', 'Q', 'N']),
         ~Q(cn_tracking__exact=''), Q(cn_tracking__isnull=False),
         ~Q(person_id__exact=''), Q(person_id__isnull=False), (Q(in_no__istartswith='HH') | Q(in_no__istartswith='HC')))
     if dt:
@@ -632,9 +666,11 @@ def cal_total_cnt(dt, qs, src_loc):
     total_a1 = total_qs.filter(channel__name='A1').count()
     total_a2 = total_qs.filter(channel__name='A2').count()
     total_a3 = total_qs.filter(channel__name='A3').count()
+    total_a4 = total_qs.filter(channel__name='A4').count()
     total_k2 = total_qs.filter(channel__name='K2').count()
     total_q = total_qs.filter(channel__name='Q').count()
-    return total_a1, total_a2, total_a3, total_k2, total_q, total_waybill_cnt
+    total_n = total_qs.filter(channel__name='N').count()
+    return total_a1, total_a2, total_a3, total_a4, total_k2, total_q, total_n, total_waybill_cnt
 
 
 def get_shelf_list_str(qs, src_loc, in_no, channel, dt):
@@ -1613,7 +1649,7 @@ def get_k_no_pid_excel(request):
     air_waybill = request.data.get('air_waybill', '')
     q = Q(Q(status__order_index__lte=109),
           Q(status__order_index__gte=1),
-          Q(channel__name='K2'),
+          Q(channel__name__in=[CH19, CH23]),
           Q(Q(people__isnull=True) | Q(people__id_card_front__isnull=True) | Q(people__id_card_front__exact='') | Q(
               people__status=3)))
     if air_waybill:

@@ -50,7 +50,7 @@ def notify_user_upload_person_info2(mobile, name, tracking_no):
             w.save()
             return send_sms_person_id_1(mobile, name, tracking_no)
         else:
-            if w.channel.name == 'K2' and w.people and not w.people.id_card_front:
+            if w.channel.name in [CH19, CH23] and w.people and not w.people.id_card_front:
                 w.sms_notify_times += 1
                 w.save()
                 return send_sms_upload_id_card(mobile, tracking_no, name)
@@ -115,7 +115,7 @@ def notify_user_upload_person_info2_batch2(in_no):
             to_be_sent_new[w.recv_mobile] = (w.recv_name, w.tracking_no)
             w.sms_notify_times += 1
         else:
-            if w.channel.name == 'K2' and not w.people.id_card_front:
+            if w.channel.name in [CH19, CH23] and not w.people.id_card_front:
                 to_be_sent_pic[w.recv_mobile] = (w.recv_name, w.tracking_no)
                 w.sms_notify_times += 1
         w.save()
@@ -165,14 +165,21 @@ def notfiy_user_up_id_finish_packing(mobile, name, tracking_no):
 @shared_task
 def match_person_id():
     qs = Waybill.objects.filter(person_id__iexact='').filter(status__order_index=1)
+    succ = match_person_helper(qs)
+    qs2 = Waybill.objects.filter(channel__name__in=[CH19, CH23]).filter(status__order_index__lt=109).filter(
+        people__isnull=True)
+    succ2 = match_person_helper(qs2)
+    return {'total': qs.count() + qs2.count(), 'succ': succ + succ2}
+
+
+def match_person_helper(qs):
     succ = 0
     for w in qs:
         p = People.objects.filter(mobile=w.recv_mobile).filter(name=w.recv_name).first()
         if p:
             succ += 1
             w.person_id = p.id_no
-            if p.id_card_front:
-                w.people = p
+            w.people = p
             w.save()
 
             if w.status.name == '已建单':
@@ -182,7 +189,7 @@ def match_person_id():
                     wms_push_person_id.delay(w.tracking_no, w.recv_name, w.person_id, w.recv_mobile)
                 except:
                     pass
-    return {'total': qs.count(), 'succ': succ}
+    return succ
 
 
 def send_sms_no_pic_helper_has_people(to_be_sent, p, tracking_no):
@@ -204,9 +211,9 @@ def send_sms_no_pic_helper_without_people(to_be_sent, w):
 
 @shared_task
 def send_sms_no_pic():
-    qs = Waybill.objects.filter(channel__name='K2').filter(Q(status__order_index__lte=109),
-                                                           Q(status__order_index__gte=2),
-                                                           Q(sms_notify_times__lt=4)).filter(
+    qs = Waybill.objects.filter(channel__name__in=[CH19, CH23]).filter(Q(status__order_index__lte=109),
+                                                                       Q(status__order_index__gte=2),
+                                                                       Q(sms_notify_times__lt=4)).filter(
         Q(people__isnull=True) | Q(people__id_card_front__isnull=True) | Q(people__id_card_front__exact=''))
     # print qs.count()
     to_be_sent = {}

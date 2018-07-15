@@ -8,7 +8,8 @@ from django.db import transaction
 from express.utils import *
 from pallets.models import *
 from waybills.models import *
-from django.db.models import Q, Min
+from django.db.models import Q
+from decimal import Decimal
 from django.utils.encoding import smart_unicode
 from django.conf import settings
 from xlwt import *
@@ -547,3 +548,126 @@ def export_q_helper(qs):
             remark = u'{0} {1}'.format(w.tracking_no, w.shelf_no if w.shelf_no else '')
             results.append(r + g + [remark])
     return results
+
+
+def get_channel_name_helper(ch):
+    if ch == 'A电商渠道':
+        return 'A3'
+
+
+def process_address(x, row):
+    recv_name = x.get('recv_name', '').strip()
+    recv_province = x.get('recv_province', '').strip()
+    recv_city = x.get('recv_city', '').strip()
+    recv_area = x.get('recv_area', '').strip()
+    recv_address = x.get('recv_address', '').strip()
+    recv_mobile = x.get('recv_mobile', '').strip()
+    recv_zipcode = x.get('recv_zipcode', '').strip()
+
+    if recv_name == "":
+        raise Exception('{0}行 姓名不能为空'.format(row + 2))
+    if recv_province == "":
+        raise Exception('{0}行 省份不能为空'.format(row + 2))
+    if recv_city == "":
+        raise Exception('{0}行 城市不能为空'.format(row + 2))
+    if recv_address == "":
+        raise Exception('{0}行 地址不能为空'.format(row + 2))
+    if recv_mobile == "":
+        raise Exception('{0}行 收件人电话不能为空'.format(row + 2))
+    if recv_area == "":
+        recv_area = "其他区"
+
+    return {"recv_name": recv_name,
+            "recv_province": recv_province,
+            "recv_city": recv_city,
+            "recv_area": recv_area,
+            "recv_address": recv_address,
+            "recv_mobile": recv_mobile,
+            "recv_zipcode": recv_zipcode,
+            }
+
+
+def add_sku(tracking_no, x, row):
+    brand = x.get('brand', '').strip()
+    quantity = x.get('quantity', '')
+    unit_price = x.get('unit_price', '')
+    description = x.get('description', '').strip()
+
+    if not brand:
+        raise Exception('{0}行 品牌不能为空'.format(row + 2))
+    try:
+        quantity = int(quantity)
+        if quantity <= 0:
+            raise Exception('{0}行 数量必须是大于0的整数'.format(row + 2))
+    except Exception as e:
+        raise Exception('{0}行 数量必须是大于0的整数'.format(row + 2))
+    try:
+        unit_price = Decimal(unit_price)
+        if unit_price <= 0:
+            raise Exception('{0}行 申报单价必须是大于0'.format(row + 2))
+    except Exception as e:
+        raise Exception('{0}行 申报单价必须是大于0'.format(row + 2))
+    if not description:
+        raise Exception('{0}行 物品描述不能为空'.format(row + 2))
+
+    if Waybill.objects.filter(tracking_no=tracking_no).exists():
+        w = Waybill.objects.get(tracking_no=tracking_no)
+        Good.objects.create(brand=brand, description=description, waybill=w, quantity=quantity, unit_price=unit_price,
+                            hs_type=description, remark=x.get('remark', ''))
+    else:
+        raise Exception('{0}行 {1}运单不存在'.format(row + 2, tracking_no))
+
+
+def add_waybill(x, import_channel, address_obj, user):
+    w = Waybill.objects.create(channel=import_channel,
+                               tracking_no=x.get('tracking_no', '').strip().upper(),
+                               order_no=x.get('order_no', '').strip(),
+                               weight=x.get('weight', Decimal(2.0)),
+                               user=user,
+                               recv_name=address_obj['recv_name'],
+                               recv_province=address_obj['recv_province'],
+                               recv_city=address_obj['recv_city'],
+                               recv_area=address_obj['recv_area'],
+                               recv_address=address_obj['recv_address'],
+                               recv_zipcode=address_obj['recv_zipcode'],
+                               recv_mobile=address_obj['recv_mobile'],
+                               send_name=user.username,
+                               init_loc=Location.objects.get(short_name='NJ'),
+                               person_id=x.get('person_id', '').strip(),
+                               src_loc=SrcLoc.objects.get(name='NJ'))
+
+
+@transaction.atomic()
+def import_waybill_from_excel(file, user, channel):
+    sheet = file.get_sheet()
+    sheet.name_columns_by_row(0)
+    sheet.colnames = ['no', 'tracking_no', 'cn_tracking', 'order_no', 'create_dt', 'channel_name', 'dest',
+                      '-', 'package_cnt', 'weight', 'recv_name', 'person_id', 'company', 'recv_province', 'recv_city',
+                      'recv_area', 'recv_address', 'recv_mobile', 'type', 'pay', 'brand', 'description', 'quantity',
+                      'unit_price', 'remark1', 'remark2', 'remark']
+    row = 0
+    new_waybill_cnt = 0
+    last_tracking_no = ''
+    for x in sheet.to_records():
+        if x.get('brand', '').strip() == "":
+            continue
+        tracking_no = x.get('tracking_no', '').strip().upper()
+        if tracking_no:
+            if Waybill.objects.filter(tracking_no=tracking_no).exists():
+                raise Exception('{0}行 运单号{1}存在, 请勿重复导入'.format(row + 2, tracking_no))
+            try:
+                address_obj = process_address(x, row)
+            except Exception as e:
+                raise Exception(e.message)
+
+            add_waybill(x, channel, address_obj, user)
+            add_sku(tracking_no, x, row)
+            new_waybill_cnt += 1
+        else:
+            if last_tracking_no == "":
+                raise Exception('{0}行 运单号不能为空'.format(row + 2))
+            else:
+                add_sku(last_tracking_no, x, row)
+        last_tracking_no = tracking_no
+        row += 1
+    return new_waybill_cnt

@@ -640,6 +640,9 @@ def waybill_search_view(request):
                           "person_id_update_dt": waybill.upload_person_id_dt.astimezone(
                               pytz.timezone('Asia/Shanghai')) if waybill.upload_person_id_dt else None,
                           "is_error": waybill.status.name == u'运单异常',
+                          "lack_person_id_pic": waybill.status.order_index < 109 and waybill.channel.name in [CH19,
+                                                                                                              CH23] and (
+                          not waybill.people or not waybill.people.id_card_front),
                           "status_set": []}
 
             has_cn_json = False

@@ -1771,6 +1771,270 @@ def sigang_page(c, obj):
     c.showPage()
 
 
+def nn_one_page(c, obj):
+    c.setDash(1, 2)
+    story = []
+    f = Frame(0.08 * inch, 0.07 * inch, (4 - 0.08 * 2) * inch, (6 - 0.07 * 2) * inch, showBoundary=0)
+    f.addFromList(story, c)
+    ### 从上到下划线 ###
+    x1, x2, x3 = 1.519 * inch, 2 * inch, 3 * inch
+    y1 = 5.160 * inch
+    y2 = 4.393 * inch
+    y3 = 3.632 * inch
+    y4 = 2.862 * inch
+    y5 = 2.351 * inch
+    y6 = 1.658 * inch
+    y7 = 0.922 * inch
+    ys = [y1, y2, y3, y4, y5, y6, y7]
+    for y in ys:
+        draw_line_horizontal(c, 0 * inch, 4 * inch, y)
+
+    ### 从左到右 ###
+    # draw_line_vertical(c, 6 * inch, y1, x1)
+    draw_line_vertical(c, y1, y2, x2)
+    draw_line_vertical(c, y3, y4, x2)
+    draw_line_vertical(c, y6, y7, x2)
+    draw_line_vertical(c, 0, y7, x3)
+
+    ## barcdoe ##
+    qfbarcode1 = code128.Code128(obj['cn_tracking_no'], barWidth=0.48 * mm, barHeight=0.45 * inch, humanReadable=1,
+                                 fontSize=12, fontName='Times-Roman')
+    qfbarcode1.drawOn(c, x1 - 0.2 * inch, y1 + 0.3 * inch)
+    qfbarcode1.drawOn(c, 0.2 * inch, y6 + 0.2 * inch)
+
+    # LOGO
+    c.drawImage('static/img/XCLOGO.png', 0.1 * inch, y1 + 0.2 * inch, width=0.89 * inch, height=0.566 * inch)
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y1 - 0.15 * inch, u'寄件:')
+
+    c.setFont('Helvetica', 10)
+    c.drawString(0.4 * inch, y1 - 0.15 * inch, u'HuskyEx')
+    c.drawString(0.4 * inch, y1 - 0.30 * inch, u'7323174312')
+    c.drawString(0.1 * inch, y1 - 0.45 * inch, u'77 Glendale Ave, Edison, NJ')
+
+    c.setFont("STSong-Light", 6)
+
+    recv_1 = u'收件: %s  %s' % (obj[u'recv_name'], obj[u'mobile'])
+    recv_2 = u'%s %s %s %s' % (obj[u"recv_prov"], obj[u"recv_city"], obj[u"recv_area"], obj[u"recv_address"])
+    story = []
+    style = ParagraphStyle('Normal')
+    style.fontName = "STSong-Light"
+    style.fontSize = 10 if len(recv_2) < 70 else 9
+    style.wordWrap = 'CJK'
+    style.leading = 10 if len(recv_2) < 70 else 9
+
+    story.append(Paragraph(recv_1, style))
+    story.append(Paragraph(recv_2, style))
+    f = Frame(0.1 * inch, y3 - 0.15 * inch, 3.55 * inch, 0.8 * inch, showBoundary=0, leftPadding=0,
+              rightPadding=0, topPadding=0)
+    f.addFromList(story, c)
+
+    est_weight = obj[u'weight'] * Decimal(0.45359) if obj[u'weight'] != 1 else 0.5 + random.randint(0, 20) / 10.0
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y3 - 0.20 * inch, u'收件人/代收人:')
+    c.drawString(0.1 * inch, y3 - 0.40 * inch, u'签收时间       年    月   日    时')
+
+    c.setFont("STSong-Light", 25)
+    c.drawString(x2 + 0.1 * inch, y3 - 0.3 * inch, u'已验视')
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y4 - 0.15 * inch, u'订单号:')
+    c.drawString(x2 + 0.1 * inch, y4 - 0.15 * inch, u'重量: %.1f' % (est_weight))
+    c.drawString(x2 + 1 * inch, y4 - 0.15 * inch, u'件数: 1')
+
+    c.drawString(0.8 * inch, y4 - 0.15 * inch, obj[u'tracking_no'])
+
+    detail = u'配送信息: %s' % (obj[u'goods2'])
+    story = []
+    style = ParagraphStyle('Normal')
+    style.fontName = "STSong-Light"
+    style.fontSize = 10 if len(detail) < 70 else 9
+    style.leading = 10 if len(detail) < 70 else 9
+    style.wordWrap = 'CJK'
+    story.append(Paragraph(detail, style))
+    f = Frame(0.1 * inch, y5 - 0.47 * inch, 3.55 * inch, 0.8 * inch, showBoundary=0, leftPadding=0,
+              rightPadding=0, topPadding=0)
+    f.addFromList(story, c)
+
+    c.drawImage('static/img/CP.png', 3 * inch, y6 + 0.12 * inch, width=0.89 * inch, height=0.566 * inch)
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y6 - 0.15 * inch, u'寄件:')
+    c.setFont('Helvetica', 10)
+    c.drawString(0.4 * inch, y6 - 0.15 * inch, u'HuskyEx')
+    c.drawString(0.4 * inch, y6 - 0.30 * inch, u'7323174312')
+    c.drawString(0.1 * inch, y6 - 0.45 * inch, u'77 Glendale Ave, Edison, NJ')
+
+    c.setFont("STSong-Light", 10)
+    recv_1 = u'收件: %s  %s' % (obj[u'recv_name'], obj[u'mobile'])
+    c.drawString(x2 + 0.1 * inch, y6 - 0.2 * inch, recv_1)
+
+    recv_2 = u'%s %s %s %s' % (obj[u"recv_prov"], obj[u"recv_city"], obj[u"recv_area"], obj[u"recv_address"])
+    story = []
+    style = ParagraphStyle('Normal')
+    style.fontName = "STSong-Light"
+    style.fontSize = 10 if len(recv_2) <= 30  else 9 if len(recv_2) < 40 else 8 if len(recv_2) < 60 else 6
+    style.wordWrap = 'CJK'
+    style.leading = 10 if len(recv_2) <= 30  else 9 if len(recv_2) < 60 else 8 if len(recv_2) < 60 else 6
+    story.append(Paragraph(recv_2, style))
+    f = Frame(x2 + 0.1 * inch, y7 - 0.1 * inch, 1.8 * inch, 0.6 * inch, showBoundary=0, leftPadding=0,
+              rightPadding=0, topPadding=0)
+    f.addFromList(story, c)
+
+    c.setFont("STSong-Light", 7)
+    c.drawString(0.1 * inch, y7 - 0.15 * inch, u'收货前请确认包装是否完整, 有无破损, 如有问题请拒签收')
+    c.drawString(0.1 * inch, y7 - 0.4 * inch, u'退建地址：中国东盟(广西)国际快件监管中心')
+    c.drawString(0.1 * inch, y7 - 0.6 * inch, u'广西是南宁市良庆区银海大道1219号南宁综合')
+    c.drawString(0.1 * inch, y7 - 0.8 * inch, u'电子产业园a208, 电话:15289691652')
+
+    # c.setFont("Helvetica", 10)
+    # c.drawString(0.1 * inch, y7 - 0.7 * inch, u'www.ems.com.cn')
+    # c.setFont("STSong-Light", 8)
+    # c.drawString(1.5 * inch, y7 - 0.7 * inch, u'客服: 11183')
+
+    # c.setFont("STSong-Light", 24)
+    # c.drawString(x3 + 0.05 * inch, y7 - 0.55 * inch,
+    #              ExpressMark.get_ems_mark1(obj[u"recv_prov"], obj[u"recv_city"], obj[u"recv_area"]))
+
+    c.showPage()
+
+
+def a4_one_page(c, obj):
+    c.setDash(1, 2)
+    story = []
+    f = Frame(0.08 * inch, 0.07 * inch, (4 - 0.08 * 2) * inch, (6 - 0.07 * 2) * inch, showBoundary=0)
+    f.addFromList(story, c)
+    ### 从上到下划线 ###
+    x1, x2, x3 = 1.519 * inch, 2 * inch, 3 * inch
+    y1 = 5.160 * inch
+    y2 = 4.393 * inch
+    y3 = 3.632 * inch
+    y4 = 2.862 * inch
+    y5 = 2.351 * inch
+    y6 = 1.658 * inch
+    y7 = 0.922 * inch
+    ys = [y1, y2, y3, y4, y5, y6, y7]
+    for y in ys:
+        draw_line_horizontal(c, 0 * inch, 4 * inch, y)
+
+    ### 从左到右 ###
+    # draw_line_vertical(c, 6 * inch, y1, x1)
+    draw_line_vertical(c, y1, y2, x2)
+    draw_line_vertical(c, y3, y4, x2)
+    draw_line_vertical(c, y6, y7, x2)
+    draw_line_vertical(c, 0, y7, x3)
+
+    ## barcdoe ##
+    qfbarcode1 = code128.Code128(obj['cn_tracking_no'], barWidth=0.48 * mm, barHeight=0.45 * inch, humanReadable=1,
+                                 fontSize=12, fontName='Times-Roman')
+    qfbarcode1.drawOn(c, x1 - 0.2 * inch, y1 + 0.3 * inch)
+    qfbarcode1.drawOn(c, 0.2 * inch, y6 + 0.2 * inch)
+
+    # LOGO
+    # c.drawImage('static/img/XCLOGO.png', 0.1 * inch, y1 + 0.2 * inch, width=0.89 * inch, height=0.566 * inch)
+    c.setFont("STSong-Light", 18)
+
+    c.drawString(0.1 * inch, y1 + 0.3 * inch, u'快递包裹')
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y1 - 0.15 * inch, u'寄件:')
+
+    c.setFont('Helvetica', 10)
+    c.drawString(0.4 * inch, y1 - 0.15 * inch, u'HuskyEx')
+    c.drawString(0.4 * inch, y1 - 0.30 * inch, u'7323174312')
+    c.drawString(0.1 * inch, y1 - 0.45 * inch, u'77 Glendale Ave, Edison, NJ')
+    c.setFont('Helvetica', 14)
+    c.drawString(3.5 * inch, y1 - 0.5 * inch, u'A4')
+
+    c.setFont("STSong-Light", 6)
+
+    recv_1 = u'收件: %s  %s' % (obj[u'recv_name'], obj[u'mobile'])
+    recv_2 = u'%s %s %s %s' % (obj[u"recv_prov"], obj[u"recv_city"], obj[u"recv_area"], obj[u"recv_address"])
+    story = []
+    style = ParagraphStyle('Normal')
+    style.fontName = "STSong-Light"
+    style.fontSize = 10 if len(recv_2) < 70 else 9
+    style.wordWrap = 'CJK'
+    style.leading = 10 if len(recv_2) < 70 else 9
+
+    story.append(Paragraph(recv_1, style))
+    story.append(Paragraph(recv_2, style))
+    f = Frame(0.1 * inch, y3 - 0.15 * inch, 3.55 * inch, 0.8 * inch, showBoundary=0, leftPadding=0,
+              rightPadding=0, topPadding=0)
+    f.addFromList(story, c)
+
+    est_weight = obj[u'weight'] * Decimal(0.45359) if obj[u'weight'] != 1 else 0.5 + random.randint(0, 20) / 10.0
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y3 - 0.20 * inch, u'收件人/代收人:')
+    c.drawString(0.1 * inch, y3 - 0.40 * inch, u'签收时间       年    月   日    时')
+
+    c.setFont("STSong-Light", 25)
+    c.drawString(x2 + 0.1 * inch, y3 - 0.3 * inch, u'已验视')
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y4 - 0.15 * inch, u'订单号:')
+    c.drawString(x2 + 0.1 * inch, y4 - 0.15 * inch, u'重量: %.1f' % (est_weight))
+    c.drawString(x2 + 1 * inch, y4 - 0.15 * inch, u'件数: 1')
+
+    c.drawString(0.8 * inch, y4 - 0.15 * inch, obj[u'tracking_no'])
+
+    detail = u'配送信息: %s' % (obj[u'goods2'])
+    story = []
+    style = ParagraphStyle('Normal')
+    style.fontName = "STSong-Light"
+    style.fontSize = 10 if len(detail) < 70 else 9
+    style.leading = 10 if len(detail) < 70 else 9
+    style.wordWrap = 'CJK'
+    story.append(Paragraph(detail, style))
+    f = Frame(0.1 * inch, y5 - 0.47 * inch, 3.55 * inch, 0.8 * inch, showBoundary=0, leftPadding=0,
+              rightPadding=0, topPadding=0)
+    f.addFromList(story, c)
+
+    c.drawImage('static/img/CP.png', 3 * inch, y6 + 0.12 * inch, width=0.89 * inch, height=0.566 * inch)
+
+    c.setFont("STSong-Light", 10)
+    c.drawString(0.1 * inch, y6 - 0.15 * inch, u'寄件:')
+    c.setFont('Helvetica', 10)
+    c.drawString(0.4 * inch, y6 - 0.15 * inch, u'HuskyEx')
+    c.drawString(0.4 * inch, y6 - 0.30 * inch, u'7323174312')
+    c.drawString(0.1 * inch, y6 - 0.45 * inch, u'77 Glendale Ave, Edison, NJ')
+
+    c.setFont("STSong-Light", 10)
+    recv_1 = u'收件: %s  %s' % (obj[u'recv_name'], obj[u'mobile'])
+    c.drawString(x2 + 0.1 * inch, y6 - 0.2 * inch, recv_1)
+
+    recv_2 = u'%s %s %s %s' % (obj[u"recv_prov"], obj[u"recv_city"], obj[u"recv_area"], obj[u"recv_address"])
+    story = []
+    style = ParagraphStyle('Normal')
+    style.fontName = "STSong-Light"
+    style.fontSize = 10 if len(recv_2) <= 30  else 9 if len(recv_2) < 40 else 8 if len(recv_2) < 60 else 6
+    style.wordWrap = 'CJK'
+    style.leading = 10 if len(recv_2) <= 30  else 9 if len(recv_2) < 60 else 8 if len(recv_2) < 60 else 6
+    story.append(Paragraph(recv_2, style))
+    f = Frame(x2 + 0.1 * inch, y7 - 0.1 * inch, 1.8 * inch, 0.6 * inch, showBoundary=0, leftPadding=0,
+              rightPadding=0, topPadding=0)
+    f.addFromList(story, c)
+
+    c.setFont("STSong-Light", 7)
+    c.drawString(0.1 * inch, y7 - 0.15 * inch, u'收货前请确认包装是否完整, 有无破损, 如有问题请拒签收')
+    c.drawString(0.1 * inch, y7 - 0.4 * inch, u'退建地址：广西南宁市良庆区银海大道1219号 ')
+    c.drawString(0.1 * inch, y7 - 0.6 * inch, u'王培春 13599265325')
+
+    # c.setFont("Helvetica", 10)
+    # c.drawString(0.1 * inch, y7 - 0.7 * inch, u'www.ems.com.cn')
+    # c.setFont("STSong-Light", 8)
+    # c.drawString(1.5 * inch, y7 - 0.7 * inch, u'客服: 11183')
+
+    # c.setFont("STSong-Light", 24)
+    # c.drawString(x3 + 0.05 * inch, y7 - 0.55 * inch,
+    #              ExpressMark.get_ems_mark1(obj[u"recv_prov"], obj[u"recv_city"], obj[u"recv_area"]))
+
+    c.showPage()
+
+
 def draw_line_horizontal(c, x1, x2, y):
     l = c.beginPath()
     l.moveTo(x1, y)
@@ -1826,6 +2090,10 @@ def draw_label(c, obj):
         ch8_one_page(c, obj)
     elif obj['channel_name'] == "SF":
         sigang_page(c, obj)
+    elif obj['channel_name'] == CH23:
+        nn_one_page(c, obj)
+    elif obj['channel_name'] == CH24:
+        a4_one_page(c, obj)
     else:
         default_one_page(c, obj)
 

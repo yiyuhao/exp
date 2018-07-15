@@ -44,7 +44,7 @@ def get_custom_data(air_waybill, waybills):
         result = z_bc_data(air_waybill.air_waybill_no, waybills)
     elif air_waybill.channel.name == CH16:
         result = h_bc_data(air_waybill.air_waybill_no, waybills)
-    elif air_waybill.channel.name in [CH17, CH18, CH19]:
+    elif air_waybill.channel.name in [CH17, CH18, CH19, CH23]:
         result = k_bc_data(air_waybill.air_waybill_no, waybills)
     else:
         result = fj_bc_data(air_waybill.air_waybill_no, waybills)
@@ -695,6 +695,7 @@ def yunfei_export(qs):
         r.append(w.package_fee)
         r.append(w.tax_fee)
         r.append(w.weight)
+        results.append(r)
     import pyexcel
     pyexcel.save_as(array=results, dest_file_name=settings.MEDIA_ROOT + '/t2.xlsx')
 
